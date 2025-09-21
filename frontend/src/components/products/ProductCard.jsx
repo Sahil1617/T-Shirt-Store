@@ -23,7 +23,7 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
           <h3 className="font-semibold text-lg">{product.name}</h3>
           <p className="text-gray-600 mt-2 line-clamp-2">{product.description}</p>
           <div className="flex items-center justify-between mt-4">
-            <span className="text-2xl font-bold text-primary-600">${product.price}</span>
+            <span className="text-2xl font-bold text-primary-600">₹{product.price}</span>
             <div className="flex space-x-2">
               <button className="p-2 text-gray-600 hover:text-primary-600">
                 <HeartIcon className="h-5 w-5" />
@@ -68,7 +68,7 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
       </p>
       
       <div className="flex items-center justify-between">
-        <span className="text-lg font-bold text-primary-600">${product.price}</span>
+        <span className="text-lg font-bold text-primary-600">₹{product.price}</span>
         <button
           onClick={handleAddToCart}
           className="bg-primary-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-primary-700 transition-colors"

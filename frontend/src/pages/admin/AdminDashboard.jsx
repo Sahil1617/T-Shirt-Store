@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import { 
-  PackageIcon, UsersIcon, DollarSignIcon, 
+  PackageIcon, UsersIcon, IndianRupeeIcon, 
   ShoppingCartIcon, PlusIcon, EditIcon, 
-  TrashIcon, BarChart3Icon 
+  TrashIcon,PlusCircle,
+  Edit,
+  Package,
+  FileText,
+  Image as ImageIcon,
+  Tag,
+  Layers,
+  X
 } from 'lucide-react';
 import api from '../../config/axios';
 import { toast } from 'react-hot-toast';
@@ -125,15 +132,20 @@ const AdminDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <button
-          onClick={() => setShowProductForm(true)}
-          className="btn-primary flex items-center"
-        >
-          <PlusIcon className="h-4 w-4 mr-2" />
-          Add Product
-        </button>
-      </div>
+  {/* Title */}
+  <h1 className="text-3xl font-extrabold text-gray-900">
+    Admin Dashboard
+  </h1>
+
+  {/* Add Product Button */}
+  <button
+    onClick={() => setShowProductForm(true)}
+    className="flex items-center bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-transform duration-200 hover:scale-105"
+  >
+    <PlusIcon className="h-5 w-5 mr-2" />
+    Add Product
+  </button>
+</div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -176,11 +188,11 @@ const AdminDashboard = () => {
         <div className="card p-6">
           <div className="flex items-center">
             <div className="p-3 bg-orange-100 rounded-lg">
-              <DollarSignIcon className="h-6 w-6 text-orange-600" />
+              <IndianRupeeIcon className="h-6 w-6 text-orange-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold">${stats.totalRevenue}</p>
+              <p className="text-2xl font-bold">₹{stats.totalRevenue}</p>
             </div>
           </div>
         </div>
@@ -200,7 +212,7 @@ const AdminDashboard = () => {
                   <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded" />
                   <div className="ml-3">
                     <p className="font-medium">{product.name}</p>
-                    <p className="text-sm text-gray-600">${product.price}</p>
+                    <p className="text-sm text-gray-600">₹{product.price}</p>
                   </div>
                 </div>
                 <div className="flex space-x-2">
@@ -242,7 +254,7 @@ const AdminDashboard = () => {
                   </span>
                 </div>
                 <p className="text-sm text-gray-600">
-                  ${order.totalAmount} • {new Date(order.createdAt).toLocaleDateString()}
+                  ₹{order.totalAmount} • {new Date(order.createdAt).toLocaleDateString()}
                 </p>
               </div>
             ))}
@@ -252,78 +264,147 @@ const AdminDashboard = () => {
 
       {/* Product Form Modal */}
       {showProductForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingProduct ? 'Edit Product' : 'Add New Product'}
-            </h2>
-            <form onSubmit={handleProductSubmit} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Product Name"
-                value={productForm.name}
-                onChange={(e) => setProductForm({...productForm, name: e.target.value})}
-                className="input-field"
-                required
-              />
-              <textarea
-                placeholder="Description"
-                value={productForm.description}
-                onChange={(e) => setProductForm({...productForm, description: e.target.value})}
-                className="input-field"
-                rows="3"
-                required
-              />
-              <input
-                type="number"
-                placeholder="Price"
-                value={productForm.price}
-                onChange={(e) => setProductForm({...productForm, price: e.target.value})}
-                className="input-field"
-                required
-              />
-              <input
-                type="url"
-                placeholder="Image URL"
-                value={productForm.image}
-                onChange={(e) => setProductForm({...productForm, image: e.target.value})}
-                className="input-field"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Category"
-                value={productForm.category}
-                onChange={(e) => setProductForm({...productForm, category: e.target.value})}
-                className="input-field"
-                required
-              />
-              <input
-                type="number"
-                placeholder="Stock"
-                value={productForm.stock}
-                onChange={(e) => setProductForm({...productForm, stock: e.target.value})}
-                className="input-field"
-                required
-              />
-              <div className="flex space-x-4">
-                <button type="submit" className="btn-primary flex-1">
-                  {editingProduct ? 'Update' : 'Create'} Product
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowProductForm(false);
-                    setEditingProduct(null);
-                  }}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all duration-300 scale-100 hover:scale-[1.01] relative">
+      
+      {/* Close Button */}
+      <button
+        onClick={() => {
+          setShowProductForm(false);
+          setEditingProduct(null);
+        }}
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition"
+      >
+        <X className="w-6 h-6" />
+      </button>
+
+      {/* Header */}
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 border-b pb-3 flex items-center justify-center gap-2">
+        {editingProduct ? (
+          <>
+            <Edit className="w-6 h-6 text-orange-500" />
+            Edit Product
+          </>
+        ) : (
+          <>
+            <PlusCircle className="w-6 h-6 text-orange-500" />
+            Add New Product
+          </>
+        )}
+      </h2>
+
+      {/* Form */}
+      <form onSubmit={handleProductSubmit} className="space-y-5">
+        
+        {/* Product Name */}
+        <div className="flex items-center gap-2">
+          <Package className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Product Name"
+            value={productForm.name}
+            onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
+            required
+          />
         </div>
+
+        {/* Description */}
+        <div className="flex items-start gap-2">
+          <FileText className="w-5 h-5 text-gray-500 mt-2" />
+          <textarea
+            placeholder="Description"
+            value={productForm.description}
+            onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
+            rows="3"
+            required
+          />
+        </div>
+
+        {/* Price */}
+        <div className="flex items-center gap-2">
+          <IndianRupeeIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="number"
+            placeholder="Price"
+            value={productForm.price}
+            onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
+            required
+          />
+        </div>
+
+        {/* Image URL */}
+        <div className="flex items-center gap-2">
+          <ImageIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="url"
+            placeholder="Image URL"
+            value={productForm.image}
+            onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
+            required
+          />
+        </div>
+
+        {/* Category */}
+        <div className="flex items-center gap-2">
+          <Tag className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Category"
+            value={productForm.category}
+            onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
+            required
+          />
+        </div>
+
+        {/* Stock */}
+        <div className="flex items-center gap-2">
+          <Layers className="w-5 h-5 text-gray-500" />
+          <input
+            type="number"
+            placeholder="Stock"
+            value={productForm.stock}
+            onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })}
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
+            required
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="flex space-x-4 pt-4">
+          <button
+            type="submit"
+            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg py-2 shadow-md flex items-center justify-center gap-2 transition-transform duration-200 hover:scale-105"
+          >
+            {editingProduct ? (
+              <>
+                <Edit className="w-4 h-4" /> Update Product
+              </>
+            ) : (
+              <>
+                <PlusCircle className="w-4 h-4" /> Create Product
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowProductForm(false);
+              setEditingProduct(null);
+            }}
+            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg py-2 shadow-md flex items-center justify-center gap-2 transition-transform duration-200 hover:scale-105"
+          >
+            <X className="w-4 h-4" /> Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
       )}
     </div>
   );

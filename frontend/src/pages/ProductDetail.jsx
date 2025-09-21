@@ -1,8 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { StarIcon, HeartIcon, ShareIcon, TruckIcon, ShieldCheckIcon, ArrowLeftIcon } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import api from '../config/axios';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import {
+  StarIcon,
+  HeartIcon,
+  ShareIcon,
+  TruckIcon,
+  ShieldCheckIcon,
+  ArrowLeftIcon,
+} from "lucide-react";
+import { useCart } from "../context/CartContext";
+import api from "../config/axios";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -23,7 +30,7 @@ const ProductDetail = () => {
       const response = await api.get(`/api/products/${id}`);
       setProduct(response.data);
     } catch (error) {
-      console.error('Error fetching product:', error);
+      console.error("Error fetching product:", error);
     } finally {
       setLoading(false);
     }
@@ -34,7 +41,7 @@ const ProductDetail = () => {
       const response = await api.get(`/api/products?limit=4`);
       setRelatedProducts(response.data.products);
     } catch (error) {
-      console.error('Error fetching related products:', error);
+      console.error("Error fetching related products:", error);
     }
   };
 
@@ -68,9 +75,13 @@ const ProductDetail = () => {
     <div className="max-w-6xl mx-auto p-6">
       {/* Breadcrumb */}
       <nav className="flex items-center text-sm text-gray-500 mb-6">
-        <a href="/" className="hover:text-primary-600">Home</a>
+        <a href="/" className="hover:text-primary-600">
+          Home
+        </a>
         <span className="mx-2">/</span>
-        <a href="/products" className="hover:text-primary-600">Products</a>
+        <a href="/products" className="hover:text-primary-600">
+          Products
+        </a>
         <span className="mx-2">/</span>
         <span className="text-gray-900">{product.name}</span>
       </nav>
@@ -88,14 +99,16 @@ const ProductDetail = () => {
               <HeartIcon className="h-5 w-5 text-gray-600" />
             </button>
           </div>
-          
+
           <div className="grid grid-cols-4 gap-2">
             {images.map((img, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}
                 className={`h-20 border-2 rounded-lg overflow-hidden ${
-                  selectedImage === index ? 'border-primary-600' : 'border-gray-200'
+                  selectedImage === index
+                    ? "border-primary-600"
+                    : "border-gray-200"
                 }`}
               >
                 <img
@@ -110,17 +123,19 @@ const ProductDetail = () => {
 
         {/* Product Info */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
-          
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            {product.name}
+          </h1>
+
           <div className="flex items-center mb-4">
             <div className="flex items-center">
               {[1, 2, 3, 4, 5].map((star) => (
                 <StarIcon
                   key={star}
                   className={`h-5 w-5 ${
-                    star <= 4 ? 'text-yellow-400' : 'text-gray-300'
+                    star <= 4 ? "text-yellow-400" : "text-gray-300"
                   }`}
-                  fill={star <= 4 ? 'currentColor' : 'none'}
+                  fill={star <= 4 ? "currentColor" : "none"}
                 />
               ))}
             </div>
@@ -128,9 +143,13 @@ const ProductDetail = () => {
           </div>
 
           <div className="mb-6">
-            <span className="text-3xl font-bold text-primary-600">${product.price}</span>
+            <span className="text-3xl font-bold text-primary-600">
+              ₹{product.price}
+            </span>
             {product.originalPrice && (
-              <span className="ml-2 text-lg text-gray-500 line-through">${product.originalPrice}</span>
+              <span className="ml-2 text-lg text-gray-500 line-through">
+                ₹{product.originalPrice}
+              </span>
             )}
           </div>
 
@@ -138,7 +157,9 @@ const ProductDetail = () => {
 
           {/* Quantity Selector */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Quantity
+            </label>
             <select
               value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value))}
@@ -157,11 +178,12 @@ const ProductDetail = () => {
             <button
               onClick={handleAddToCart}
               disabled={!product.stock}
-              className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               Add to Cart
             </button>
-            <button className="btn-secondary">
+
+            <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 flex items-center justify-center">
               <ShareIcon className="h-5 w-5" />
             </button>
           </div>
@@ -170,7 +192,7 @@ const ProductDetail = () => {
           <div className="space-y-3">
             <div className="flex items-center text-sm text-gray-600">
               <TruckIcon className="h-5 w-5 mr-2 text-green-600" />
-              Free shipping on orders over $50
+              Free shipping on orders over ₹499
             </div>
             <div className="flex items-center text-sm text-gray-600">
               <ShieldCheckIcon className="h-5 w-5 mr-2 text-blue-600" />
@@ -192,7 +214,9 @@ const ProductDetail = () => {
                 className="w-full h-48 object-cover rounded-lg mb-4"
               />
               <h3 className="font-semibold mb-2">{relatedProduct.name}</h3>
-              <p className="text-primary-600 font-bold">${relatedProduct.price}</p>
+              <p className="text-primary-600 font-bold">
+                ₹{relatedProduct.price}
+              </p>
             </div>
           ))}
         </div>

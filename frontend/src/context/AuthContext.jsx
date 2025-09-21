@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect } from 'react';
+import { createContext, useContext, useReducer, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import api from '../config/axios';
 
@@ -9,12 +9,12 @@ const authReducer = (state, action) => {
     case 'LOGIN_START':
       return { ...state, loading: true, error: null };
     case 'LOGIN_SUCCESS':
-      return { 
-        ...state, 
-        loading: false, 
-        user: action.payload.user, 
+      return {
+        ...state,
+        loading: false,
+        user: action.payload.user,
         token: action.payload.token,
-        error: null 
+        error: null,
       };
     case 'LOGIN_FAILURE':
       return { ...state, loading: false, error: action.payload };
@@ -33,49 +33,56 @@ const authReducer = (state, action) => {
 
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, {
-    user: null,
-    token: localStorage.getItem('token'),
+    user: JSON.parse(localStorage.getItem('user')) || null,
+    token: localStorage.getItem('token') || null,
     loading: false,
-    error: null
+    error: null,
   });
 
+  const [isAuthReady, setIsAuthReady] = useState(false); // NEW
+
   useEffect(() => {
-    if (state.token) {
-      verifyToken();
+    const token = localStorage.getItem('token');
+    if (token) {
+      verifyToken(token).finally(() => setIsAuthReady(true));
+    } else {
+      setIsAuthReady(true);
     }
   }, [state.token]);
 
-  const verifyToken = async () => {
+  const verifyToken = async (token) => {
     try {
-      const response = await api.get('/api/auth/verify');
+      const res = await api.get('/api/auth/verify', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       dispatch({
         type: 'LOGIN_SUCCESS',
-        payload: {
-          user: response.data.user,
-          token: state.token
-        }
+        payload: { user: res.data.user, token },
       });
-    } catch (error) {
-      console.error('Token verification failed:', error);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+    } catch (err) {
+      console.error('Token verification failed:', err);
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       dispatch({ type: 'LOGOUT' });
     }
   };
 
-  const login = async (email, password) => {
+  // Login function supports admin login
+  const login = async (email, password, isAdmin = false) => {
     dispatch({ type: 'LOGIN_START' });
     try {
-      const response = await api.post('/api/auth/login', { email, password });
-      const { token, user } = response.data;
-      
+      const endpoint = isAdmin ? '/api/admin/auth/login' : '/api/auth/login';
+      const res = await api.post(endpoint, { email, password });
+      const { token, user } = res.data;
+
       localStorage.setItem('token', token);
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: { user, token }
-      });
+      localStorage.setItem('user', JSON.stringify(user));
+
+      dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
       toast.success('Login successful!');
-    } catch (error) {
-      const message = error.response?.data?.msg || 'Login failed';
+    } catch (err) {
+      const message = err.response?.data?.msg || 'Login failed';
       dispatch({ type: 'LOGIN_FAILURE', payload: message });
       toast.error(message);
     }
@@ -84,17 +91,16 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password) => {
     dispatch({ type: 'LOGIN_START' });
     try {
-      const response = await api.post('/api/auth/register', { name, email, password });
-      const { token, user } = response.data;
-      
+      const res = await api.post('/api/auth/register', { name, email, password });
+      const { token, user } = res.data;
+
       localStorage.setItem('token', token);
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: { user, token }
-      });
+      localStorage.setItem('user', JSON.stringify(user));
+
+      dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
       toast.success('Registration successful!');
-    } catch (error) {
-      const message = error.response?.data?.msg || 'Registration failed';
+    } catch (err) {
+      const message = err.response?.data?.msg || 'Registration failed';
       dispatch({ type: 'LOGIN_FAILURE', payload: message });
       toast.error(message);
     }
@@ -102,30 +108,30 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     dispatch({ type: 'LOGOUT' });
     toast.success('Logged out successfully');
   };
 
-  const clearError = () => {
-    dispatch({ type: 'CLEAR_ERROR' });
-  };
+  const clearError = () => dispatch({ type: 'CLEAR_ERROR' });
 
   const updateUser = (userData) => {
     dispatch({ type: 'UPDATE_USER', payload: userData });
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   return (
-    <AuthContext.Provider value={{
-      user: state.user,
-      token: state.token,
-      loading: state.loading,
-      error: state.error,
-      login,
-      register,
-      logout,
-      clearError,
-      updateUser
-    }}>
+    <AuthContext.Provider
+      value={{
+        ...state,
+        login,
+        register,
+        logout,
+        clearError,
+        updateUser,
+        isAuthReady, // NEW
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

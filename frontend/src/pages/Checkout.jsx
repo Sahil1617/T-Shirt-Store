@@ -74,210 +74,220 @@ const Checkout = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+   <div className="max-w-6xl mx-auto p-6 lg:p-10">
+  <h1 className="text-4xl font-extrabold mb-10 text-gray-900 tracking-tight">
+    🧾 Checkout
+  </h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Checkout Form */}
-        <div>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Contact Information */}
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center">
-                <CreditCardIcon className="h-5 w-5 mr-2 text-primary-600" />
-                Contact Information
-              </h2>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="input-field"
-                required
-              />
-            </div>
-
-            {/* Shipping Address */}
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center">
-                <TruckIcon className="h-5 w-5 mr-2 text-primary-600" />
-                Shipping Address
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="firstName"
-                  placeholder="First Name"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  required
-                />
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder="Last Name"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  required
-                />
-              </div>
-              <input
-                type="text"
-                name="address"
-                placeholder="Address"
-                value={formData.address}
-                onChange={handleInputChange}
-                className="input-field"
-                required
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="city"
-                  placeholder="City"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  required
-                />
-                <input
-                  type="text"
-                  name="state"
-                  placeholder="State"
-                  value={formData.state}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="zipCode"
-                  placeholder="ZIP Code"
-                  value={formData.zipCode}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  required
-                />
-                <select
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                  className="input-field"
-                >
-                  <option value="United States">United States</option>
-                  <option value="Canada">Canada</option>
-                  <option value="United Kingdom">United Kingdom</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Payment Information */}
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center">
-                <LockIcon className="h-5 w-5 mr-2 text-primary-600" />
-                Payment Information
-              </h2>
-              <input
-                type="text"
-                name="cardNumber"
-                placeholder="Card Number"
-                value={formData.cardNumber}
-                onChange={handleInputChange}
-                className="input-field"
-                required
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="expiryDate"
-                  placeholder="MM/YY"
-                  value={formData.expiryDate}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  required
-                />
-                <input
-                  type="text"
-                  name="cvv"
-                  placeholder="CVV"
-                  value={formData.cvv}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  required
-                />
-              </div>
-              <input
-                type="text"
-                name="nameOnCard"
-                placeholder="Name on Card"
-                value={formData.nameOnCard}
-                onChange={handleInputChange}
-                className="input-field"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full py-3 text-lg disabled:opacity-50"
-            >
-              {loading ? 'Processing...' : 'Complete Order'}
-            </button>
-          </form>
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+    {/* Checkout Form */}
+    <div>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Contact Information */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <h2 className="text-xl font-semibold mb-5 flex items-center">
+            <CreditCardIcon className="h-5 w-5 mr-2 text-orange-500" />
+            Contact Information
+          </h2>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleInputChange}
+            className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-400 focus:outline-none"
+            required
+          />
         </div>
 
-        {/* Order Summary */}
-        <div>
-          <div className="card p-6 sticky top-24">
-            <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
-            
-            <div className="space-y-4">
-              {items.map((item) => (
-                <div key={item.product._id} className="flex items-center">
-                  <img
-                    src={item.product.image}
-                    alt={item.product.name}
-                    className="w-12 h-12 object-cover rounded"
-                  />
-                  <div className="ml-4 flex-1">
-                    <h3 className="font-medium">{item.product.name}</h3>
-                    <p className="text-gray-600">Qty: {item.quantity}</p>
-                  </div>
-                  <span className="font-semibold">
-                    ${(item.product.price * item.quantity).toFixed(2)}
-                  </span>
-                </div>
-              ))}
-            </div>
+        {/* Shipping Address */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <h2 className="text-xl font-semibold mb-5 flex items-center">
+            <TruckIcon className="h-5 w-5 mr-2 text-orange-500" />
+            Shipping Address
+          </h2>
 
-            <div className="border-t pt-4 mt-4 space-y-2">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>${getCartTotal().toFixed(2)}</span>
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              name="firstName"
+              placeholder="First Name"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              className="input-field text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              required
+            />
+            <input
+              type="text"
+              name="lastName"
+              placeholder="Last Name"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              className="input-field text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              required
+            />
+          </div>
+
+          <input
+            type="text"
+            name="address"
+            placeholder="Address"
+            value={formData.address}
+            onChange={handleInputChange}
+            className="input-field mt-4 w-full text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+            required
+          />
+
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <input
+              type="text"
+              name="city"
+              placeholder="City"
+              value={formData.city}
+              onChange={handleInputChange}
+              className="input-field text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              required
+            />
+            <input
+              type="text"
+              name="state"
+              placeholder="State"
+              value={formData.state}
+              onChange={handleInputChange}
+              className="input-field text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <input
+              type="text"
+              name="zipCode"
+              placeholder="ZIP Code"
+              value={formData.zipCode}
+              onChange={handleInputChange}
+              className="input-field text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              required
+            />
+            <select
+              name="country"
+              value={formData.country}
+              onChange={handleInputChange}
+              className="input-field text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+            >
+              <option value="United States">India</option>
+              <option value="Canada">Canada</option>
+              <option value="United Kingdom">United Kingdom</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Payment Information */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <h2 className="text-xl font-semibold mb-5 flex items-center">
+            <LockIcon className="h-5 w-5 mr-2 text-orange-500" />
+            Payment Information
+          </h2>
+
+          <input
+            type="text"
+            name="cardNumber"
+            placeholder="Card Number"
+            value={formData.cardNumber}
+            onChange={handleInputChange}
+            className="input-field w-56 text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+            required
+          />
+
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <input
+              type="text"
+              name="expiryDate"
+              placeholder="MM/YY"
+              value={formData.expiryDate}
+              onChange={handleInputChange}
+              className="input-field text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              required
+            />
+            <input
+              type="text"
+              name="cvv"
+              placeholder="CVV"
+              value={formData.cvv}
+              onChange={handleInputChange}
+              className="input-field text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              required
+            />
+          </div>
+
+          <input
+            type="text"
+            name="nameOnCard"
+            placeholder="Name on Card"
+            value={formData.nameOnCard}
+            onChange={handleInputChange}
+            className="input-field w-56 mt-4 text-center border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-400 focus:outline-none"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-4 text-lg font-semibold rounded-xl bg-orange-500 hover:bg-orange-600 text-white transition disabled:opacity-50 shadow-md"
+        >
+          {loading ? "Processing..." : "Complete Order"}
+        </button>
+      </form>
+    </div>
+
+    {/* Order Summary */}
+    <div>
+      <div className="bg-gradient-to-b from-white to-gray-50 rounded-2xl shadow-lg p-6 border border-gray-100 sticky top-24">
+        <h2 className="text-2xl font-bold mb-6 text-gray-900">Order Summary</h2>
+
+        <div className="space-y-4 mb-6">
+          {items.map((item) => (
+            <div key={item.product._id} className="flex items-center">
+              <img
+                src={item.product.image}
+                alt={item.product.name}
+                className="w-14 h-14 object-cover rounded-lg shadow-sm"
+              />
+              <div className="ml-4 flex-1">
+                <h3 className="font-medium text-gray-800">{item.product.name}</h3>
+                <p className="text-gray-500 text-sm">Qty: {item.quantity}</p>
               </div>
-              <div className="flex justify-between">
-                <span>Shipping</span>
-                <span className="text-green-600">Free</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Tax</span>
-                <span>${(getCartTotal() * 0.08).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-lg font-bold pt-2 border-t">
-                <span>Total</span>
-                <span>${(getCartTotal() * 1.08).toFixed(2)}</span>
-              </div>
+              <span className="font-semibold text-gray-900">
+                ₹{(item.product.price * item.quantity).toFixed(2)}
+              </span>
             </div>
+          ))}
+        </div>
+
+        <div className="border-t pt-4 space-y-2 text-gray-700">
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+            <span>₹{getCartTotal().toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Shipping</span>
+            <span className="text-green-600 font-medium">Free</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Tax (8%)</span>
+            <span>₹{(getCartTotal() * 0.08).toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-lg font-bold border-t pt-3 text-gray-900">
+            <span>Total</span>
+            <span>₹{(getCartTotal() * 1.08).toFixed(2)}</span>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
   );
 };
 
