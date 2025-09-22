@@ -84,7 +84,7 @@ const Footer = () => {
               {[
                 { icon: MapPinIcon, text: 'Pune, Maharashtra' },
                 { icon: PhoneIcon, text: '+91 1234 5678' },
-                { icon: MailIcon, text: 'support@tshirtstore.com' },
+                { icon: MailIcon, text: 'sahiljadhav1617@gmail.com' },
               ].map((item, idx) => (
                 <div key={idx} className="flex items-center">
                   <item.icon className="h-5 w-5 text-cyan-500 mr-3" />

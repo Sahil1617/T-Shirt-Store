@@ -19,8 +19,9 @@ router.get('/', auth, async (req, res) => {
 // Add to cart (User access)
 router.post('/', auth, async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
-    
+    const { productId, quantity, size} = req.body;
+    if (!size) return res.status(400).json({ msg: 'Size is required' });
+
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ msg: 'Product not found' });
@@ -30,7 +31,7 @@ router.post('/', auth, async (req, res) => {
     
     // Check if product already in cart
     const existingItemIndex = user.cart.findIndex(
-      item => item.product.toString() === productId
+      item => item.product.toString() === productId && item.size === size
     );
 
     if (existingItemIndex > -1) {
@@ -40,7 +41,8 @@ router.post('/', auth, async (req, res) => {
       // Add new item to cart
       user.cart.push({
         product: productId,
-        quantity
+        quantity,
+        size
       });
     }
 
@@ -57,11 +59,11 @@ router.post('/', auth, async (req, res) => {
 // Update cart item quantity (User access)
 router.put('/:productId', auth, async (req, res) => {
   try {
-    const { quantity } = req.body;
+    const { quantity, size } = req.body;
     
     const user = await User.findById(req.user.id);
     const itemIndex = user.cart.findIndex(
-      item => item.product.toString() === req.params.productId
+      item => item.product.toString() === req.params.productId  && item.size === size
     );
 
     if (itemIndex === -1) {
@@ -82,6 +84,9 @@ router.put('/:productId', auth, async (req, res) => {
 // Remove from cart (User access)
 router.delete('/:productId', auth, async (req, res) => {
   try {
+    const { size } = req.body; // get size from request body
+    if (!size) return res.status(400).json({ msg: 'Size is required to remove item' });
+    
     const user = await User.findById(req.user.id);
     user.cart = user.cart.filter(
       item => item.product.toString() !== req.params.productId

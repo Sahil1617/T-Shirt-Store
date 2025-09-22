@@ -18,7 +18,14 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [size, setSize] = useState ("");
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    if (product && product.sizes && product.sizes.length > 0) {
+      setSize(product.sizes[0]);  // select first size automatically
+    }
+  }, [product]);
 
   useEffect(() => {
     fetchProduct();
@@ -46,7 +53,7 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    addToCart(product, quantity, size);
   };
 
   if (loading) {
@@ -154,23 +161,48 @@ const ProductDetail = () => {
           </div>
 
           <p className="text-gray-600 mb-6">{product.description}</p>
+            
+            {/* Quantity and Size */}
+          <div className="mb-6 flex flex-wrap items-end gap-6">
+            {/* Quantity */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">
+                Quantity
+              </label>
+              <select
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value))}
+                className="w-28 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-800 shadow-sm
+                        focus:border-blue-500 focus:ring-2 focus:ring-blue-400 transition duration-200"
+              >
+                {[...Array(Math.min(product.stock || 10, 10))].map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Quantity Selector */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Quantity
-            </label>
-            <select
-              value={quantity}
-              onChange={(e) => setQuantity(parseInt(e.target.value))}
-              className="input-field w-32"
-            >
-              {[...Array(Math.min(product.stock || 10, 10))].map((_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </select>
+            {/* Size */}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-700 mb-1">
+                  Size
+                </label>
+                <select
+                  value={size}
+                  onChange={(e) => setSize(e.target.value)}
+                  className="w-32 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-800 shadow-sm
+                          focus:border-blue-500 focus:ring-2 focus:ring-blue-400 transition duration-200"
+                >
+                  {product.sizes.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Add to Cart */}

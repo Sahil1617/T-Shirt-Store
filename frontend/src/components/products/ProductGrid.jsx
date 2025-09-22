@@ -18,7 +18,7 @@ const ProductGrid = ({ products, loading, viewMode = 'grid' }) => {
     );
   }
 
-  if (products.length === 0) {
+  if (products && products.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500 text-lg">No products found.</p>
@@ -32,7 +32,7 @@ const ProductGrid = ({ products, loading, viewMode = 'grid' }) => {
       ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" 
       : "space-y-4"
     }>
-      {products.map(product => (
+      {products?.map(product => (
         <ProductCard key={product._id} product={product} viewMode={viewMode} />
       ))}
     </div>

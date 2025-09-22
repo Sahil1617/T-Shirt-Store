@@ -72,7 +72,7 @@ const ContactUs = () => {
               </div>
               <div className="flex items-center">
                 <MailIcon className="h-6 w-6 text-primary-600 mr-4" />
-                <span className="text-gray-700">support@tshirtstore.com</span>
+                <span className="text-gray-700">sahiljadhav1617@gmail.com</span>
               </div>
             </div>
 
@@ -102,7 +102,7 @@ const ContactUs = () => {
                   value={formData.name}
                   onChange={handleChange}
                   className="mt-1 block w-full rounded-lg border-gray-300 px-4 py-3 shadow-sm focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="John Doe"
+                  placeholder="Name"
                 />
               </div>
 
@@ -118,7 +118,7 @@ const ContactUs = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="mt-1 block w-full rounded-lg border-gray-300 px-4 py-3 shadow-sm focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="you@example.com"
+                  placeholder="Email"
                 />
               </div>
 
@@ -141,7 +141,7 @@ const ContactUs = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-primary-600 hover:bg-primary-700 text-black border-2 border-black font-semibold py-3 rounded-lg shadow-md transition-all flex items-center justify-center"
+                className="w-full bg-primary-600 hover:bg-primary-700 text-white border-2 bg-blue-500 border-black font-bold py-3 rounded-lg shadow-md transition-all flex items-center justify-center hover:bg-blue-600"
               >
                 {loading ? (
                   <span className="animate-pulse">Sending...</span>

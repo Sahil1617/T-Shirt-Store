@@ -3,8 +3,8 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 const ProductFilters = ({ filters, onFilterChange }) => {
   const categories = ['Men', 'Women', 'Graphic', 'Plain', 'Premium'];
   const priceRanges = [
-    { label: 'Under ₹100', value: '0-25' },
-    { label: '₹100 - ₹300', value: '25-50' },
+    { label: 'Under ₹200', value: '0-25' },
+    { label: '₹200 - ₹300', value: '25-50' },
     { label: '₹300 - ₹700', value: '50-100' },
     { label: 'Over ₹700', value: '100+' }
   ];
