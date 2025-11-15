@@ -107,7 +107,7 @@ t-shirt-store/
 
 ### Backend (.env)
 ```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/t-shirt-store
+MONGODB_URI=your_url
 JWT_SECRET=your_super_secret_jwt_key_here_make_it_strong
 PORT=5000
 
