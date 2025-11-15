@@ -1,26 +1,82 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Save } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const UserProfile = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: ''
+    phone: user?.phone || '',
+    address: user?.address || '',
+    city: user?.city || '',
+    state: user?.state || '',
+    zipCode: user?.zipCode || '',
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const saveUserProfile = async (data) => {
+  try {
+    const token = localStorage.getItem('token'); // Assuming you store JWT here
+    const response = await fetch('http://localhost:5000/api/user/profile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Server error:', errorText);
+      throw new Error('Failed to save user profile');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    alert('Error saving profile. Please try again.');
+  }
+};
+
+ useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/user/profile', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!res.ok) {
+        console.log("Profile fetch failed");
+        return;
+      }
+
+      const data = await res.json();
+      setFormData((prev) => ({ ...prev, ...data }));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  fetchProfile();
+}, []);
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle profile update
+    const updatedUser = await saveUserProfile(formData);
+    if (updatedUser) {
+      updateUser(updatedUser);      // 🔥 Update AuthContext
+      setFormData(updatedUser);
+    }
   };
 
   return (
@@ -78,7 +134,7 @@ const UserProfile = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     className="w-full border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
-                    placeholder="Your phone number"
+                    placeholder={formData.phone}
                   />
                 </div>
               </div>
@@ -94,7 +150,7 @@ const UserProfile = () => {
                     value={formData.address}
                     onChange={handleChange}
                     className="w-full border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
-                    placeholder="Your street address"
+                    placeholder={formData.address}
                   />
                 </div>
               </div>
@@ -106,7 +162,7 @@ const UserProfile = () => {
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  placeholder="City"
+                  placeholder={formData.city}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
                 />
                 <input
@@ -114,7 +170,7 @@ const UserProfile = () => {
                   name="state"
                   value={formData.state}
                   onChange={handleChange}
-                  placeholder="State"
+                  placeholder={formData.state}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
                 />
                 <input
@@ -122,7 +178,7 @@ const UserProfile = () => {
                   name="zipCode"
                   value={formData.zipCode}
                   onChange={handleChange}
-                  placeholder="ZIP"
+                  placeholder={formData.zipCode}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
                 />
               </div>
@@ -142,24 +198,30 @@ const UserProfile = () => {
         {/* Account Summary */}
         <div className="lg:col-span-1">
           <div className="bg-white shadow-lg rounded-2xl p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Account Summary</h2>
+            <h2 className="text-xl text-center font-semibold mb-4 text-gray-800">
+              Account Summary
+            </h2>
 
             <div className="space-y-4">
+
+              {/* Profile */}
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                  <User className="h-6 w-6 text-orange-600" />
+                  <span className="text-orange-600 font-bold text-xl">
+                    {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
+                  </span>
                 </div>
                 <div className="ml-4">
-                  <p className="font-medium">{user?.name}</p>
-                  <p className="text-sm text-gray-600">{user?.email}</p>
+                  <p className="font-medium">{formData.name}</p>
+                  <p className="text-sm text-gray-600">{formData.email}</p>
+                  <p className="text-sm text-gray-600">{formData.phone}</p>
+                  Address: <p className="text-sm text-gray-600">
+                    {formData.address}, {formData.city}, {formData.state} {formData.zipCode}
+                  </p>
                 </div>
               </div>
 
-              <div className="border-t pt-4">
-                <h3 className="font-semibold mb-2">Member since</h3>
-                <p className="text-gray-600">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</p>
-              </div>
-
+              {/* Account Type */}
               <div className="border-t pt-4">
                 <h3 className="font-semibold mb-2">Account type</h3>
                 <p className="text-gray-600 capitalize">{user?.role}</p>
@@ -167,6 +229,7 @@ const UserProfile = () => {
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );

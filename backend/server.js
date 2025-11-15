@@ -16,10 +16,12 @@ app.use(cors({
   origin: 'http://localhost:5173', // Your frontend URL
   credentials: true
 }));
+
 app.use(express.json({ extended: false }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
+app.use('/api/user', require('./routes/userProfile'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin/auth', require('./routes/adminAuth')); // Admin auth routes
 app.use('/api/admin', require('./routes/admin')); // Admin management routes

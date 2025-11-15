@@ -92,24 +92,6 @@ const Footer = () => {
                 </div>
               ))}
             </div>
-
-            {/* Newsletter Subscription */}
-            <div className="mt-6">
-              <h4 className="font-semibold mb-3">Subscribe to Newsletter</h4>
-              <form className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                />
-                <button
-                  type="submit"
-                  className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-cyan-700 hover:to-blue-700 transition-colors shadow-md"
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
           </div>
 
         </div>

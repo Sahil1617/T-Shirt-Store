@@ -89,7 +89,7 @@ router.delete('/:productId', auth, async (req, res) => {
     
     const user = await User.findById(req.user.id);
     user.cart = user.cart.filter(
-      item => item.product.toString() !== req.params.productId
+      item => !(item.product.toString() === req.params.productId && item.size === size)
     );
     
     await user.save();

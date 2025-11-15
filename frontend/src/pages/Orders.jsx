@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PackageIcon, CalendarIcon, DollarSignIcon } from 'lucide-react';
+import { PackageIcon, CalendarIcon, IndianRupeeIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/axios';
 
@@ -115,7 +115,7 @@ const Orders = () => {
               </span>
             </div>
             <div className="flex items-center">
-              <DollarSignIcon className="h-5 w-5 text-gray-400 mr-2" />
+              <IndianRupeeIcon className="h-5 w-5 text-gray-400 mr-2" />
               <span className="text-sm text-gray-600">
                 ₹{order.totalAmount.toFixed(2)}
               </span>

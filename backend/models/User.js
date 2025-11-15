@@ -20,7 +20,28 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user'
   },
+  phone: {
+    type: String,
+    default: ''
+  },
+  address: {
+    type: String,
+    default: ''
+  },
+  city: {
+    type: String,
+    default: ''
+  },
+  state: {
+    type: String,
+    default: ''
+  },
+  zipCode: {
+    type: String,
+    default: ''
+  },
   cart: [{
+
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Product'
