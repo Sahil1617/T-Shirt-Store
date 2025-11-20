@@ -20,8 +20,8 @@ const orderSchema = new mongoose.Schema({
       type: Number,
       required: true
     },
-    size: String,
-    color: String
+    size: {type: String},
+    color: {type: String}
   }],
   totalAmount: {
     type: Number,

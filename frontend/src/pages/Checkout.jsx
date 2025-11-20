@@ -41,7 +41,8 @@ const Checkout = () => {
         items: items.map(item => ({
           product: item.product._id,
           quantity: item.quantity,
-          price: item.product.price
+          price: item.product.price,
+          size: item.size,
         })),
         totalAmount: getCartTotal() * 1.08, // Including tax
         shippingAddress: {
@@ -324,7 +325,7 @@ const Checkout = () => {
                     </div>
                     <div className="ml-4 flex-1">
                       <h3 className="font-semibold text-gray-900 mb-1">{item.product.name}</h3>
-                      <p className="text-gray-500 text-sm">Size: M • Color: Blue</p>
+                      <p className="text-gray-500 text-sm">Size : {item.size} | Quantity : {item.quantity}</p>
                     </div>
                     <span className="font-bold text-gray-900 text-lg">
                       ₹{(item.product.price * item.quantity).toFixed(2)}

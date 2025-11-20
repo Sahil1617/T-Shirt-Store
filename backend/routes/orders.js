@@ -37,7 +37,8 @@ router.get('/my-orders', auth, async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user.id })
       .populate('items.product')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
     
     res.json(orders);
   } catch (error) {
