@@ -1,235 +1,271 @@
-import { useState, useEffect } from 'react';
-import { User, Mail, Phone, MapPin, Save } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+  import { useState, useEffect } from 'react';
+  import { 
+    User, 
+    Mail, 
+    Phone, 
+    MapPin, 
+    Save, 
+    Loader2,
+    Camera,
+    CreditCard,
+    Package,
+    ChevronRight
+  } from 'lucide-react';
+  import { useAuth } from '../context/AuthContext';
+  import { motion } from 'framer-motion';
+  import { toast } from 'react-hot-toast';
+  import api from '../config/axios';
 
-const UserProfile = () => {
-  const { user, updateUser } = useAuth();
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    address: user?.address || '',
-    city: user?.city || '',
-    state: user?.state || '',
-    zipCode: user?.zipCode || '',
-  });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const saveUserProfile = async (data) => {
-  try {
-    const token = localStorage.getItem('token'); // Assuming you store JWT here
-    const response = await fetch('http://localhost:5000/api/user/profile', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-      credentials: 'include',
+  const UserProfile = () => {
+    const { user, updateUser } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      address: user?.address || '',
+      city: user?.city || '',
+      state: user?.state || '',
+      zipCode: user?.zipCode || '',
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Server error:', errorText);
-      throw new Error('Failed to save user profile');
-    }
+    useEffect(() => {
+      const fetchProfile = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) return;
+          
+          const res = await api.get("/api/user/profile");
+          setFormData((prev) => ({ ...prev, ...res.data }));
+          } catch (err) {
+            console.error(err);
+          }
+      };
+      fetchProfile();
+    }, []);
 
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-    alert('Error saving profile. Please try again.');
-  }
-};
+    const handleChange = (e) => {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
- useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const res = await fetch('http://localhost:5000/api/user/profile', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+        const response = await api.post("/api/user/profile", formData);
 
-      if (!res.ok) {
-        console.log("Profile fetch failed");
-        return;
+        updateUser(response.data);
+        setFormData(response.data);
+
+        toast.success("Profile updated successfully", {
+          style: { background: "#fff", color: "#000" },
+        });
+      } catch (error) {
+        toast.error("Could not update profile");
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const data = await res.json();
-      setFormData((prev) => ({ ...prev, ...data }));
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // UI Components
+  const SectionTitle = ({ title, subtitle }) => (
+    <div className="mb-8">
+      <h3 className="text-xl font-semibold text-white tracking-tight">{title}</h3>
+      <p className="text-zinc-500 text-sm mt-1">{subtitle}</p>
+    </div>
+  );
 
-  fetchProfile();
-}, []);
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const updatedUser = await saveUserProfile(formData);
-    if (updatedUser) {
-      updateUser(updatedUser);      // 🔥 Update AuthContext
-      setFormData(updatedUser);
-    }
-  };
+  const InputField = ({ label, name, type = "text", value, icon: Icon, readOnly = false }) => (
+    <div className="group relative">
+      <label className="block text-xs font-medium text-zinc-500 mb-2 group-focus-within:text-white transition-colors">
+        {label}
+      </label>
+      <div className="relative">
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={handleChange}
+          readOnly={readOnly}
+          className={`
+            w-full bg-zinc-900/50 text-white rounded-2xl py-4 pl-12 pr-4 border border-transparent 
+            focus:bg-zinc-900 focus:border-zinc-700 focus:outline-none focus:ring-0 
+            transition-all duration-300 placeholder-zinc-700
+            ${readOnly ? 'opacity-60 cursor-not-allowed' : ''}
+          `}
+          placeholder="Not set"
+        />
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-white transition-colors">
+          <Icon size={18} />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-extrabold mb-8 text-gray-900">Profile Settings</h1>
+    <div className="min-h-screen bg-black text-white pb-20">
+      
+      {/* --- Ambient Background --- */}
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-zinc-900/40 via-black to-black pointer-events-none" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Personal Info */}
-        <div className="lg:col-span-2">
-          <div className="bg-white shadow-lg rounded-2xl p-6">
-            <h2 className="text-xl font-semibold mb-6 text-gray-800">Personal Information</h2>
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-10"
+        >
+          
+          {/* --- LEFT COLUMN: Profile Card --- */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="sticky top-8">
+              <div className="bg-zinc-900/30 backdrop-blur-xl border border-zinc-800/50 rounded-3xl p-8 text-center overflow-hidden relative">
+                {/* Decorative Blur */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-white/5 blur-3xl rounded-full pointer-events-none"></div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Name & Email */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
-                      placeholder="Your full name"
-                    />
+                <div className="relative inline-block mb-6 group cursor-pointer">
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-b from-zinc-700 to-zinc-900 p-1 shadow-2xl">
+                    <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden relative">
+                      <span className="text-4xl font-bold text-zinc-700 select-none">
+                        {formData.name ? formData.name.charAt(0).toUpperCase() : <User />}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 right-0 bg-white text-black p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                    <Camera size={16} />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
-                      placeholder="Your email address"
-                    />
-                  </div>
-                </div>
-              </div>
+                <h2 className="text-2xl font-bold text-white mb-1">{formData.name || 'Anonymous'}</h2>
+                <p className="text-zinc-500 text-sm mb-6">{formData.email}</p>
 
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
-                    placeholder={formData.phone}
-                  />
-                </div>
-              </div>
-
-              {/* Address */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
-                    placeholder={formData.address}
-                  />
-                </div>
-              </div>
-
-              {/* City / State / ZIP */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  placeholder={formData.city}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
-                />
-                <input
-                  type="text"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
-                  placeholder={formData.state}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
-                />
-                <input
-                  type="text"
-                  name="zipCode"
-                  value={formData.zipCode}
-                  onChange={handleChange}
-                  placeholder={formData.zipCode}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
-                />
-              </div>
-
-              {/* Save Button */}
-              <button
-                type="submit"
-                className="flex items-center bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-transform duration-200 hover:scale-105"
-              >
-                <Save className="h-5 w-5 mr-2" />
-                Save Changes
-              </button>
-            </form>
-          </div>
-        </div>
-
-        {/* Account Summary */}
-        <div className="lg:col-span-1">
-          <div className="bg-white shadow-lg rounded-2xl p-6">
-            <h2 className="text-xl text-center font-semibold mb-4 text-gray-800">
-              Account Summary
-            </h2>
-
-            <div className="space-y-4">
-
-              {/* Profile */}
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                  <span className="text-orange-600 font-bold text-xl">
-                    {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
+                <div className="flex justify-center gap-3 mb-8">
+                  <span className="px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700 text-xs font-medium text-zinc-300">
+                    {user?.role || 'Member'}
                   </span>
-                </div>
-                <div className="ml-4">
-                  <p className="font-medium">{formData.name}</p>
-                  <p className="text-sm text-gray-600">{formData.email}</p>
-                  <p className="text-sm text-gray-600">{formData.phone}</p>
-                  Address: <p className="text-sm text-gray-600">
-                    {formData.address}, {formData.city}, {formData.state} {formData.zipCode}
-                  </p>
-                </div>
-              </div>
-
-              {/* Account Type */}
-              <div className="border-t pt-4">
-                <h3 className="font-semibold mb-2">Account type</h3>
-                <p className="text-gray-600 capitalize">{user?.role}</p>
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-medium text-emerald-500">
+                    Active Status
+                  </span>
+                </div>     
               </div>
             </div>
           </div>
-        </div>
 
+          {/* --- RIGHT COLUMN: Edit Forms --- */}
+          <div className="lg:col-span-8">
+            <form onSubmit={handleSubmit}>
+              
+              {/* 1. Personal Info */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-3xl p-8 mb-8"
+              >
+                <SectionTitle 
+                  title="Personal Information" 
+                  subtitle="Update your photo and personal details here." 
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <InputField 
+                    label="Full Name" 
+                    name="name" 
+                    value={formData.name} 
+                    icon={User} 
+                  />
+                  <InputField 
+                    label="Email Address" 
+                    name="email" 
+                    value={formData.email} 
+                    icon={Mail} 
+                    readOnly 
+                  />
+                  <div className="md:col-span-2">
+                    <InputField 
+                      label="Phone Number" 
+                      name="phone" 
+                      value={formData.phone} 
+                      icon={Phone} 
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* 2. Address Info */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-3xl p-8 mb-8"
+              >
+                <SectionTitle 
+                  title="Shipping Address" 
+                  subtitle="Used for calculating shipping and checkout." 
+                />
+                
+                <div className="space-y-6">
+                  <InputField 
+                    label="Street Address" 
+                    name="address" 
+                    value={formData.address} 
+                    icon={MapPin} 
+                  />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <InputField 
+                      label="City" 
+                      name="city" 
+                      value={formData.city} 
+                      icon={MapPin} 
+                    />
+                    <InputField 
+                      label="State / Region" 
+                      name="state" 
+                      value={formData.state} 
+                      icon={MapPin} 
+                    />
+                    <InputField 
+                      label="ZIP Code" 
+                      name="zipCode" 
+                      value={formData.zipCode} 
+                      icon={MapPin} 
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Action Bar */}
+              <div className="flex items-center justify-end gap-4 pt-4">
+                <button
+                  type="button"
+                  className="px-6 py-3 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+                  onClick={() => window.location.reload()}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="
+                    relative overflow-hidden group
+                    bg-white text-black px-8 py-3.5 rounded-xl font-semibold
+                    hover:bg-zinc-200 transition-all duration-300
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                    flex items-center gap-2
+                  "
+                >
+                  {loading ? (
+                    <Loader2 className="animate-spin" size={18} />
+                  ) : (
+                    <Save size={18} />
+                  )}
+                  <span>{loading ? 'Saving...' : 'Save Changes'}</span>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

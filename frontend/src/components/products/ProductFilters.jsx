@@ -1,95 +1,138 @@
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { motion } from 'framer-motion';
 
 const ProductFilters = ({ filters, onFilterChange }) => {
   const categories = ['Men', 'Women', 'Graphic', 'Plain', 'Premium'];
   const priceRanges = [
-    { label: 'Under ₹200', value: '0-25' },
-    { label: '₹200 - ₹300', value: '25-50' },
-    { label: '₹300 - ₹700', value: '50-100' },
-    { label: 'Over ₹700', value: '100+' }
+    { label: 'Under ₹200', value: '0-200' },
+    { label: '₹200 - ₹300', value: '200-300' },
+    { label: '₹300 - ₹700', value: '300-700' },
+    { label: 'Over ₹700', value: '700+' }
   ];
 
   const handleFilterChange = (key, value) => {
+    // Toggle logic: if clicking the active filter, clear it
+    const newValue = filters[key] === value ? '' : value;
     onFilterChange({
       ...filters,
-      [key]: value
-    });
-  };
-
-  const clearFilters = () => {
-    onFilterChange({
-      category: '',
-      priceRange: '',
-      sort: 'newest'
+      [key]: newValue
     });
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="font-semibold">Filters</h3>
-        <button
-          onClick={clearFilters}
-          className="text-sm text-primary-600 hover:text-primary-700"
-        >
-          Clear All
-        </button>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-baseline border-b border-white/10 pb-4">
+        <h3 className="text-lg font-bold text-white tracking-tight">Filter By</h3>
       </div>
 
-      {/* Categories */}
-      <div className="mb-6">
-        <h4 className="font-medium mb-3">Categories</h4>
+      {/* Categories Section */}
+      <div>
+        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">
+          Categories
+        </h4>
         <div className="space-y-2">
-          {categories.map(category => (
-            <label key={category} className="flex items-center">
-              <input
-                type="radio"
-                name="category"
-                value={category.toLowerCase()}
-                checked={filters.category === category.toLowerCase()}
-                onChange={(e) => handleFilterChange('category', e.target.value)}
-                className="mr-2 text-primary-600"
-              />
-              <span className="text-sm">{category}</span>
-            </label>
-          ))}
+          {categories.map((category) => {
+            const isActive = filters.category === category.toLowerCase();
+            return (
+              <motion.button
+                key={category}
+                whileHover={{ x: 4 }}
+                onClick={() => handleFilterChange('category', category.toLowerCase())}
+                className={`w-full flex items-center justify-between group p-2 rounded-lg transition-all duration-200 ${
+                  isActive ? 'bg-white/10' : 'hover:bg-white/5'
+                }`}
+              >
+                <span className={`text-sm font-medium transition-colors ${
+                  isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                }`}>
+                  {category}
+                </span>
+                
+                {/* Custom Radio Indicator */}
+                <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-300 ${
+                  isActive ? 'border-purple-500 bg-purple-500/20' : 'border-gray-600 group-hover:border-gray-400'
+                }`}>
+                  {isActive && (
+                    <motion.div 
+                      layoutId="cat-indicator"
+                      className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]" 
+                    />
+                  )}
+                </div>
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Price Range */}
-      <div className="mb-6">
-        <h4 className="font-medium mb-3">Price Range</h4>
+      {/* Price Range Section */}
+      <div>
+        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">
+          Price Range
+        </h4>
         <div className="space-y-2">
-          {priceRanges.map(range => (
-            <label key={range.value} className="flex items-center">
-              <input
-                type="radio"
-                name="priceRange"
-                value={range.value}
-                checked={filters.priceRange === range.value}
-                onChange={(e) => handleFilterChange('priceRange', e.target.value)}
-                className="mr-2 text-primary-600"
-              />
-              <span className="text-sm">{range.label}</span>
-            </label>
-          ))}
+          {priceRanges.map((range) => {
+            const isActive = filters.priceRange === range.value;
+            return (
+              <motion.button
+                key={range.value}
+                whileHover={{ x: 4 }}
+                onClick={() => handleFilterChange('priceRange', range.value)}
+                className={`w-full flex items-center justify-between group p-2 rounded-lg transition-all duration-200 ${
+                  isActive ? 'bg-white/10' : 'hover:bg-white/5'
+                }`}
+              >
+                <span className={`text-sm font-medium transition-colors ${
+                  isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                }`}>
+                  {range.label}
+                </span>
+
+                {/* Square Checkbox Style for variety */}
+                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300 ${
+                  isActive ? 'border-purple-500 bg-purple-500/20' : 'border-gray-600 group-hover:border-gray-400'
+                }`}>
+                  {isActive && (
+                    <motion.div 
+                      initial={{ scale: 0 }} 
+                      animate={{ scale: 1 }}
+                      className="w-2.5 h-2.5 bg-purple-500 rounded-[1px]" 
+                    />
+                  )}
+                </div>
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Sort */}
-      <div className="mb-6">
-        <h4 className="font-medium mb-3">Sort By</h4>
-        <select
-          value={filters.sort}
-          onChange={(e) => handleFilterChange('sort', e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-        >
-          <option value="newest">Newest First</option>
-          <option value="price-low">Price: Low to High</option>
-          <option value="price-high">Price: High to Low</option>
-          <option value="name">Name A-Z</option>
-        </select>
-      </div>
+      {/* Active Filter Tags (Optional visual feedback) */}
+      {(filters.category || filters.priceRange) && (
+        <div className="pt-4 border-t border-white/10">
+          <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
+            Active Filters
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {filters.category && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-500/10 border border-purple-500/30 rounded-full text-xs text-purple-300">
+                {filters.category}
+                <button onClick={() => handleFilterChange('category', filters.category)} className="hover:text-white">
+                  <XMarkIcon className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {filters.priceRange && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-xs text-blue-300">
+                {priceRanges.find(r => r.value === filters.priceRange)?.label || filters.priceRange}
+                <button onClick={() => handleFilterChange('priceRange', filters.priceRange)} className="hover:text-white">
+                  <XMarkIcon className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

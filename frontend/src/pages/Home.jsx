@@ -1,19 +1,70 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import { 
+  motion, 
+  useScroll, 
+  useTransform, 
+  useSpring,
+  useMotionValue, 
+  useMotionTemplate 
+} from "framer-motion";
 import {
   ArrowRightIcon,
   StarIcon,
+  GlobeAmericasIcon,
   ShieldCheckIcon,
-  TruckIcon,
-  SparklesIcon,
+  ArrowDownIcon
 } from "@heroicons/react/24/outline";
 import ProductGrid from "../components/products/ProductGrid";
 import api from "../config/axios";
-import CurvedLoop from "./CurvedLoop";
+
+// --- 1. GRAIN TEXTURE (Adds "Film" feel) ---
+const GrainOverlay = () => (
+  <div className="pointer-events-none fixed inset-0 z-50 opacity-[0.03] mix-blend-overlay">
+    <svg className="h-full w-full">
+      <filter id="noiseFilter">
+        <feTurbulence 
+          type="fractalNoise" 
+          baseFrequency="0.8" 
+          numOctaves="3" 
+          stitchTiles="stitch" 
+        />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+    </svg>
+  </div>
+);
+
+// --- 2. MARQUEE COMPONENT ---
+const Marquee = ({ text, reverse = false }) => {
+  return (
+    <div className="relative flex overflow-hidden border-y border-white/10 bg-black py-3 select-none">
+      <motion.div
+        className="flex whitespace-nowrap"
+        animate={{ x: reverse ? ["-50%", "0%"] : ["0%", "-50%"] }}
+        transition={{ repeat: Infinity, ease: "linear", duration: 20 }}
+      >
+        {[...Array(4)].map((_, i) => (
+          <span key={i} className="mx-4 text-xs font-mono uppercase tracking-[0.3em] text-zinc-500">
+            {text} <span className="text-white mx-2">•</span>
+          </span>
+        ))}
+      </motion.div>
+      {/* Gradient Fade Edges */}
+      <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-black to-transparent z-10"></div>
+      <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-black to-transparent z-10"></div>
+    </div>
+  );
+};
 
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const containerRef = useRef(null);
+  
+  const { scrollY } = useScroll();
+  const yParallax = useTransform(scrollY, [0, 1000], [0, 300]);
+  const opacityHero = useTransform(scrollY, [0, 500], [1, 0]);
 
   useEffect(() => {
     fetchFeaturedProducts();
@@ -24,203 +75,192 @@ const Home = () => {
       const response = await api.get("/api/products?limit=4");
       setFeaturedProducts(response.data.products);
     } catch (error) {
-      console.error("Error fetching featured products:", error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-700 via-purple-900 to-pink-900 text-white py-32 h-screen overflow-hidden">
-        {/* Background Video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute top-0 left-0 w-full h-full object-cover z-0"
-          src="/hero.mp4"
-        />
-
-        {/* Enhanced Gradient Overlay */}
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/40 via-black/50 to-black/60 z-10"></div>
-
-        {/* Animated Background Elements */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse z-10"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse delay-1000 z-10"></div>
-
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center h-full flex flex-col justify-center items-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-6 animate-fade-in">
-            <SparklesIcon className="w-4 h-4 text-yellow-300" />
-            <span className="text-sm font-medium">New Collection 2025</span>
-          </div>
-
-          <h1 className="text-5xl md:text-7xl font-black mb-6 animate-fade-in bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent leading-tight">
-            Premium Quality T-Shirts
-          </h1>
-
-          <p className="text-xl md:text-2xl mb-12 max-w-3xl mx-auto animate-slide-up text-gray-100 font-light">
-            Discover our collection of comfortable and stylish t-shirts for
-            every occasion.
-          </p>
-
-          <CurvedLoop
-            marqueeText="✦ Premium T-Shirts With Comfort & Style For Every Occasion"
-            speed={3}
-            curveAmount={1}
-            direction="right"
-            interactive={true}
-            className="custom-text-style text-white mb-8"
-          />
-
-          <Link
-            to="/products"
-            className="group mt-4 inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-900 font-bold text-lg rounded-full shadow-2xl hover:shadow-white/20 hover:scale-105 transition-all duration-300 hover:bg-gradient-to-r hover:from-white hover:to-gray-100"
-          >
-            Shop Now 
-            <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-          </Link>
-        </div>
-
-        {/* Bottom Fade */}
-        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-gray-50 to-transparent z-10"></div>
-      </section>
+    <div className="relative bg-black text-white selection:bg-white selection:text-black font-sans">
+      <GrainOverlay />
       
-      {/* Features Section */}
-      <section className="py-24 bg-white relative overflow-hidden">
-        {/* Decorative Elements */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Us
-            </h2>
-            <p className="text-gray-600 text-lg">Experience the difference with our exceptional service</p>
+      {/* --- HERO SECTION: Brutalist / Cinematic --- */}
+      <section className="relative h-screen w-full overflow-hidden border-b border-white/10">
+        {/* Video Background - Desaturated & Darkened */}
+        <motion.div 
+          style={{ y: yParallax }}
+          className="absolute inset-0 z-0"
+        >
+          <div className="absolute inset-0 bg-black/40 z-10" /> {/* Overlay */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover grayscale opacity-60 scale-105" 
+            src="/hero.mp4" 
+          />
+        </motion.div>
+
+        {/* Hero Content - Bottom Aligned, Editorial Style */}
+        <motion.div 
+          style={{ opacity: opacityHero }}
+          className="relative z-20 h-full flex flex-col justify-between px-6 md:px-12 py-12 max-w-[1800px] mx-auto"
+        >
+          {/* Top Bar */}
+          <div className="flex justify-between items-start border-b border-white/20 pb-6">
+            <div className="flex flex-col">
+              <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest">Collection</span>
+              <span className="font-bold text-white uppercase tracking-wider">Spring / Summer '25</span>
+            </div>
+            <div className="flex flex-col text-right">
+              <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest">Coordinates</span>
+              <span className="font-bold text-white uppercase tracking-wider">Pune, IN — 18.5°N</span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature: Fast Shipping */}
-            <div className="group relative text-center p-10 bg-gradient-to-br from-blue-50 to-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-blue-200 hover:-translate-y-2">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
-              <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
-                <TruckIcon className="w-10 h-10 text-white" />
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-3 text-gray-900">Fast Shipping</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Get your orders delivered quickly with our reliable shipping
-                partners.
-              </p>
+          {/* Main Title */}
+          <div className="flex flex-col md:flex-row items-end justify-between gap-10 mb-12">
+            <div className="flex flex-col">
+              <h1 className="text-[14vw] leading-[0.8] font-black tracking-tighter text-white mix-blend-difference">
+                FUTURE
+              </h1>
+              <h1 className="text-[14vw] leading-[0.8] font-black tracking-tighter text-transparent stroke-text ml-10 md:ml-32">
+                ARCHIVE
+              </h1>
+              <style>{`.stroke-text { -webkit-text-stroke: 2px white; }`}</style>
             </div>
 
-            {/* Feature: Secure Payment */}
-            <div className="group relative text-center p-10 bg-gradient-to-br from-green-50 to-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-green-200 hover:-translate-y-2">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
-              <div className="relative bg-gradient-to-br from-green-500 to-green-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
-                <ShieldCheckIcon className="w-10 h-10 text-white" />
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-3 text-gray-900">Secure Payment</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Your payment information is always protected with our secure
-                system.
+            {/* CTA Block */}
+            <div className="md:mb-8 flex flex-col items-start gap-6 max-w-sm">
+              <p className="text-zinc-300 text-sm leading-relaxed font-mono border-l border-white/30 pl-4">
+                / 01 — DEFINING THE NEW STANDARD. <br/>
+                HEAVYWEIGHT COTTON. BOX FIT. <br/>
+                ENGINEERED FOR LONGEVITY.
               </p>
+              <Link
+                to="/products"
+                className="group flex items-center gap-4 bg-white text-black px-8 py-4 text-sm font-bold uppercase tracking-widest hover:bg-zinc-200 transition-all"
+              >
+                Shop Drop
+                <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+              </Link>
             </div>
+          </div>
+        </motion.div>
+        
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 animate-bounce">
+            <ArrowDownIcon className="w-6 h-6 text-white/50" />
+        </div>
+      </section>
 
-            {/* Feature: Premium Quality */}
-            <div className="group relative text-center p-10 bg-gradient-to-br from-purple-50 to-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-purple-200 hover:-translate-y-2">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
-              <div className="relative bg-gradient-to-br from-purple-500 to-purple-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
-                <StarIcon className="w-10 h-10 text-white" />
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-3 text-gray-900">Premium Quality</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Made from high-quality materials for maximum comfort and
-                durability.
-              </p>
+      {/* --- MARQUEE DIVIDER --- */}
+      <Marquee text="PREMIUM FABRICS • GLOBAL SHIPPING • LIMITED STOCK • SECURE CHECKOUT" />
+
+      {/* --- MANIFESTO GRID (Replaces Features) --- */}
+      <section className="border-b border-white/10 bg-zinc-950">
+        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/10">
+          
+          {/* Feature 1 */}
+          <div className="group relative p-12 flex flex-col justify-between min-h-[300px] hover:bg-white/5 transition-colors">
+            <div className="flex justify-between items-start">
+              <GlobeAmericasIcon className="w-8 h-8 text-zinc-600 group-hover:text-white transition-colors" />
+              <span className="font-mono text-xs text-zinc-600">01</span>
             </div>
+            <div>
+              <h3 className="text-2xl font-black uppercase mb-2">Worldwide</h3>
+              <p className="text-zinc-500 text-sm max-w-xs">Tracked shipping to 150+ countries via DHL Express.</p>
+            </div>
+          </div>
+
+          {/* Feature 2 */}
+          <div className="group relative p-12 flex flex-col justify-between min-h-[300px] hover:bg-white/5 transition-colors">
+            <div className="flex justify-between items-start">
+              <ShieldCheckIcon className="w-8 h-8 text-zinc-600 group-hover:text-white transition-colors" />
+              <span className="font-mono text-xs text-zinc-600">02</span>
+            </div>
+            <div>
+              <h3 className="text-2xl font-black uppercase mb-2">Guarantee</h3>
+              <p className="text-zinc-500 text-sm max-w-xs">30-day returns on all unwashed, unworn items. No questions.</p>
+            </div>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="group relative p-12 flex flex-col justify-between min-h-[300px] hover:bg-white/5 transition-colors">
+            <div className="flex justify-between items-start">
+              <StarIcon className="w-8 h-8 text-zinc-600 group-hover:text-white transition-colors" />
+              <span className="font-mono text-xs text-zinc-600">03</span>
+            </div>
+            <div>
+              <h3 className="text-2xl font-black uppercase mb-2">Quality</h3>
+              <p className="text-zinc-500 text-sm max-w-xs">400GSM Heavyweight French Terry Cotton. Built to last.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* --- SHOP SECTION (Horizontal Scroll vibe) --- */}
+      <section className="py-24 bg-black relative">
+        <div className="max-w-[1800px] mx-auto px-6 md:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-zinc-900 pb-8">
+             <div>
+                <span className="font-mono text-xs text-purple-500 uppercase tracking-widest block mb-2">/// New Arrivals</span>
+                <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase">
+                   Latest<br/>Drops
+                </h2>
+             </div>
+             <Link to="/products" className="hidden md:flex items-center gap-2 text-sm font-bold uppercase tracking-widest hover:text-zinc-400 transition-colors">
+                View All <ArrowRightIcon className="w-4 h-4" />
+             </Link>
+          </div>
+
+          {/* Product Grid with stricter spacing and no shadows for cleaner look */}
+          <div className="min-h-[400px]">
+             <ProductGrid products={featuredProducts} loading={loading} />
+          </div>
+
+          <div className="mt-12 md:hidden text-center">
+             <Link to="/products" className="inline-block border border-white px-8 py-3 text-sm font-bold uppercase tracking-widest">
+                View All Products
+             </Link>
           </div>
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-24 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold mb-4">
-              TRENDING NOW
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Featured Products
+      {/* --- NEWSLETTER (Brutalist) --- */}
+      <section className="border-t border-white/10 bg-zinc-950">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+          {/* Text Side */}
+          <div className="p-12 md:p-24 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/10">
+            <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase mb-6">
+              Join the<br/><span className="text-transparent stroke-text" style={{ WebkitTextStroke: '1px white' }}>Club.</span>
             </h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Discover our most popular T-Shirts crafted with care and style
+            <p className="text-zinc-400 text-lg max-w-md">
+              Get early access to limited drops and exclusive archive sales. No spam, just gear.
             </p>
           </div>
 
-          <ProductGrid products={featuredProducts} loading={loading} />
-
-          <div className="text-center mt-16">
-            <Link
-              to="/products"
-              className="group inline-flex items-center justify-center gap-3 px-10 py-5 text-white text-lg font-bold rounded-full shadow-xl 
-               bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 
-               hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 
-               transition-all duration-300 transform hover:scale-105 hover:shadow-2xl relative overflow-hidden"
-            >
-              <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
-              <span className="relative">View All Products</span>
-              <ArrowRightIcon className="relative w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-            </Link>
+          {/* Form Side */}
+          <div className="p-12 md:p-24 flex flex-col justify-center bg-black">
+             <form className="w-full max-w-md mx-auto space-y-6">
+                <div className="group relative">
+                   <input 
+                      type="email" 
+                      placeholder="ENTER EMAIL"
+                      className="w-full bg-transparent border-b-2 border-zinc-800 py-4 text-xl font-bold text-white placeholder-zinc-700 focus:border-white focus:outline-none uppercase transition-colors"
+                   />
+                </div>
+                <button className="w-full bg-white text-black py-5 font-black uppercase tracking-widest hover:bg-zinc-200 transition-colors">
+                   Subscribe
+                </button>
+                <p className="text-center text-zinc-600 text-xs font-mono">
+                   BY SUBSCRIBING YOU AGREE TO OUR T&CS.
+                </p>
+             </form>
           </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="relative py-24 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-20">
-          <div className="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-10 right-10 w-80 h-80 bg-white rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
-
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold mb-6">
-            ✉️ NEWSLETTER
-          </div>
-
-          <h2 className="text-4xl md:text-5xl font-black mb-6 animate-fade-in">
-            Stay Updated
-          </h2>
-
-          <p className="text-xl text-white/90 mb-10 animate-slide-up max-w-2xl mx-auto">
-            Subscribe to our newsletter for exclusive offers, updates, and new
-            arrivals.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-6 py-4 rounded-full border-2 border-white/30 bg-white/10 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-white/70 font-medium transition-all duration-300"
-            />
-
-            <button className="px-8 py-4 bg-white text-purple-600 font-bold rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 hover:bg-gray-50">
-              Subscribe
-            </button>
-          </div>
-
-          <p className="mt-6 text-sm text-white/70">
-            🔒 We respect your privacy. Unsubscribe anytime.
-          </p>
         </div>
       </section>
     </div>

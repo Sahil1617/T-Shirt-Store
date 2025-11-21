@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EyeIcon, EyeOffIcon, MailIcon, LockIcon, ShieldIcon } from 'lucide-react';
+import { 
+  EyeIcon, 
+  EyeOffIcon, 
+  Shield, 
+  Terminal, 
+  ArrowLeft,
+  Cpu
+} from 'lucide-react';
 import Lightning from '../auth/Lightning';
 import api from '../../config/axios';
 import { toast } from 'react-hot-toast';
@@ -32,127 +39,145 @@ const AdminLogin = () => {
       await login(formData.email, formData.password, true);
       navigate('/admin/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.msg || 'Admin login failed');
+      toast.error(error.response?.data?.msg || 'UNAUTHORIZED_ACCESS_ATTEMPT');
     } finally {
       setLoading(false);
     }
   };
 
+  // --- STYLES ---
+  const inputClass = "w-full bg-transparent border-b border-cyan-900/50 text-white p-4 focus:border-cyan-400 focus:outline-none transition-colors duration-300 font-mono placeholder-zinc-700 text-sm";
+  const labelClass = "text-[10px] uppercase tracking-[0.2em] text-cyan-700/70 font-bold mb-1 block";
+
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
-      {/* Lightning Background */}
-      <div className="absolute inset-0 z-0">
+    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden px-4">
+      
+      {/* --- BACKGROUND LAYERS --- */}
+      <div className="absolute inset-0 z-0 opacity-30 pointer-events-none">
         <Lightning
-          hue={180}
+          hue={180} // Cyan/Teal for Admin
           xOffset={0}
-          speed={0.7}
-          intensity={0.8}
+          speed={0.5}
+          intensity={0.6}
           size={1}
         />
       </div>
 
-      {/* Dark Overlay for Better Contrast */}
-      <div className="absolute inset-0 bg-black/40 z-1"></div>
+      {/* Technical Grid Overlay */}
+      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#083344_1px,transparent_1px),linear-gradient(to_bottom,#083344_1px,transparent_1px)] bg-[size:32px_32px] opacity-20 pointer-events-none"></div>
+      
+      {/* Vignette */}
+      <div className="absolute inset-0 bg-radial-gradient(circle, transparent 20%, black 100%) pointer-events-none z-0"></div>
 
-      {/* Admin Login Form */}
-      <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-xl shadow-2xl p-8 space-y-8 relative z-10">
+      {/* --- MAIN CONTENT --- */}
+      <div className="w-full max-w-md relative z-10">
         
-        <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-            <ShieldIcon className="h-8 w-8 text-white" />
-          </div>
-          <h2 className="text-3xl font-extrabold text-gray-900">Admin Portal</h2>
-          <p className="mt-2 text-sm text-gray-600">Sign in to access the admin dashboard</p>
-        </div>
-
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        {/* Container: Darker, Cyan Borders */}
+        <div className="bg-black/80 backdrop-blur-xl border border-cyan-900/30 p-8 sm:p-12 relative overflow-hidden shadow-[0_0_50px_-12px_rgba(6,182,212,0.1)]">
           
-          {/* Email Field */}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Admin Email
-            </label>
-            <div className="mt-1 relative">
-              <MailIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="input-field block w-full rounded-lg border border-gray-300 px-10 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
-                placeholder="admin@example.com"
-                value={formData.email}
-                onChange={handleChange}
-              />
+          {/* Header */}
+          <div className="mb-10 relative">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-2 h-2 bg-cyan-500 animate-pulse shadow-[0_0_10px_cyan]"></div>
+              <span className="font-mono text-[10px] text-cyan-600 uppercase tracking-widest">Restricted_Area // Root_Access</span>
             </div>
+            <h1 className="text-4xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
+              Admin<br />Portal
+              <Shield className="w-8 h-8 text-cyan-900 stroke-[1.5]" />
+            </h1>
           </div>
 
-          {/* Password Field */}
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <div className="mt-1 relative">
-              <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <form className="space-y-8" onSubmit={handleSubmit}>
+            
+            {/* Email Field */}
+            <div className="group/field">
+              <label htmlFor="email" className={labelClass}>
+                Administrator ID
+              </label>
+              <div className="relative">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className={inputClass}
+                  placeholder="ADMIN@ROOT.SYS"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                <Terminal className="absolute right-2 top-4 w-4 h-4 text-cyan-900/50" />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div className="group/field">
+              <div className="flex justify-between items-end mb-1">
+                <label htmlFor="password" className={labelClass}>
+                  Access Protocol
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-[9px] font-mono text-cyan-800 hover:text-cyan-400 uppercase tracking-wider transition-colors"
+                >
+                  {showPassword ? '[ MASK ]' : '[ REVEAL ]'}
+                </button>
+              </div>
               <input
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
                 required
-                className="input-field block w-full rounded-lg border border-gray-300 px-10 py-3 pr-10 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
-                placeholder="Enter your password"
+                className={inputClass}
+                placeholder="••••••••••••"
                 value={formData.password}
                 onChange={handleChange}
               />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOffIcon className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <EyeIcon className="h-5 w-5 text-gray-400" />
-                )}
-              </button>
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 text-lg font-semibold text-white rounded-lg shadow-md bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 transition-all duration-300 transform hover:scale-[1.02]"
-          >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Signing in...
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-cyan-950/30 border border-cyan-900 text-cyan-400 py-4 font-bold uppercase tracking-widest hover:bg-cyan-900/20 hover:border-cyan-400 hover:text-white transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3 mt-8 group"
+            >
+              {loading ? (
+                <span className="w-4 h-4 border-2 border-cyan-900 border-t-cyan-400 rounded-full animate-spin" />
+              ) : (
+                <>
+                  Initialize Session <Cpu className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Demo Credentials - Styled as System Log */}
+          <div className="mt-8 border-t border-dashed border-cyan-900/30 pt-6">
+            <p className="text-[10px] font-mono text-cyan-900 uppercase mb-2 tracking-widest">// DEMO_CREDENTIALS</p>
+            <div className="bg-black/50 border border-zinc-900 p-3 font-mono text-[10px] text-zinc-500 space-y-1">
+              <div className="flex justify-between">
+                <span>Admin:</span>
+                <span className="text-zinc-300">admin@gmail.com</span>
               </div>
-            ) : (
-              'Sign in as Admin'
-            )}
-          </button>
-
-          {/* Demo Credentials */}
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <p className="text-sm font-medium text-gray-700 text-center mb-2">Demo Admin Credentials:</p>
-            <div className="text-xs text-gray-600 space-y-1 text-center">
-              <p>Email: admin@gmail.com</p>
-              <p>Password: admin123</p>
+              <div className="flex justify-between">
+                <span>PASS:</span>
+                <span className="text-zinc-300">admin123</span>
+              </div>
             </div>
           </div>
 
-          {/* Back to Store Link */}
-          <div className="text-center pt-4 border-t border-gray-200">
+          {/* Back Link */}
+          <div className="mt-6 text-center">
             <a 
               href="/" 
-              className="text-sm text-cyan-600 hover:text-cyan-700 transition-colors font-medium inline-flex items-center"
+              className="inline-flex items-center gap-2 text-[10px] font-mono text-zinc-600 hover:text-white transition-colors uppercase tracking-wider"
             >
-              ← Back to Store
+              <ArrowLeft className="w-3 h-3" />
+              Terminate_Sequence
             </a>
           </div>
-        </form>
+
+        </div>
       </div>
     </div>
   );

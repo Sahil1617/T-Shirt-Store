@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { 
   PackageIcon, UsersIcon, IndianRupeeIcon, 
   ShoppingCartIcon, PlusIcon, EditIcon, 
-  TrashIcon,PlusCircle,
-  Edit,
+  TrashIcon,
   Package,
   FileText,
   Image as ImageIcon,
   Tag,
   Layers,
-  X
+  X,
+  Activity,
+  Terminal,
+  ArrowRight
 } from 'lucide-react';
 import api from '../../config/axios';
 import { toast } from 'react-hot-toast';
@@ -64,10 +66,10 @@ const AdminDashboard = () => {
     try {
       if (editingProduct) {
         await api.put(`/api/products/${editingProduct._id}`, productForm);
-        toast.success('Product updated successfully');
+        toast.success('Product database updated');
       } else {
         await api.post('/api/products', productForm);
-        toast.success('Product created successfully');
+        toast.success('New entry created');
       }
       setShowProductForm(false);
       setEditingProduct(null);
@@ -83,7 +85,7 @@ const AdminDashboard = () => {
       });
       fetchDashboardData();
     } catch (error) {
-      toast.error('Failed to save product');
+      toast.error('Operation failed');
     }
   };
 
@@ -103,308 +105,312 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteProduct = async (productId) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!confirm('CONFIRM DELETION: This action cannot be undone.')) return;
     
     try {
       await api.delete(`/api/products/${productId}`);
-      toast.success('Product deleted successfully');
+      toast.success('Entry removed');
       fetchDashboardData();
     } catch (error) {
-      toast.error('Failed to delete product');
+      toast.error('Delete failed');
     }
   };
 
+  // --- STYLES ---
+  const inputClass = "w-full bg-transparent border-b border-zinc-800 text-white p-3 focus:border-white focus:outline-none transition-colors font-mono text-sm placeholder-zinc-600";
+  const labelClass = "text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-1 block";
+
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-300 rounded w-1/4 mb-8"></div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-gray-300 rounded-lg h-32"></div>
-            ))}
-          </div>
-        </div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+         <div className="text-white font-mono animate-pulse">LOADING SYSTEM DATA...</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-8">
-  {/* Title */}
-  <h1 className="text-3xl font-extrabold text-gray-900">
-    Admin Dashboard
-  </h1>
-
-  {/* Add Product Button */}
-  <button
-    onClick={() => setShowProductForm(true)}
-    className="flex items-center bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-transform duration-200 hover:scale-105"
-  >
-    <PlusIcon className="h-5 w-5 mr-2" />
-    Add Product
-  </button>
-</div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="card p-6">
-          <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <PackageIcon className="h-6 w-6 text-blue-600" />
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black pb-20">
+      
+      {/* Header */}
+      <header className="border-b border-zinc-800 sticky top-0 bg-black/80 backdrop-blur-md z-30">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-black tracking-tighter uppercase flex items-center gap-3">
+              <Terminal className="w-6 h-6" />
+              Admin_Console
+            </h1>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">System Operational</p>
             </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-600">Total Products</p>
-              <p className="text-2xl font-bold">{stats.totalProducts}</p>
+          </div>
+
+          <button
+            onClick={() => setShowProductForm(true)}
+            className="bg-white text-black hover:bg-zinc-200 px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all flex items-center gap-2 group"
+          >
+            <PlusIcon className="h-4 w-4 group-hover:rotate-90 transition-transform" />
+            New Entry
+          </button>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        
+        {/* Stats Grid - Brutalist Style */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border border-zinc-800 mb-16 bg-zinc-900/20">
+          {/* Stat 1 */}
+          <div className="p-8 border-b md:border-b-0 lg:border-r border-zinc-800 hover:bg-zinc-900 transition-colors group">
+            <div className="flex justify-between items-start mb-4">
+              <span className="text-xs font-mono text-zinc-500 group-hover:text-white transition-colors">TOTAL_PRODUCTS</span>
+              <PackageIcon className="h-4 w-4 text-zinc-600" />
             </div>
+            <p className="text-4xl font-bold font-mono">{stats.totalProducts.toString().padStart(2, '0')}</p>
+          </div>
+
+          {/* Stat 2 */}
+          <div className="p-8 border-b md:border-b-0 lg:border-r border-zinc-800 hover:bg-zinc-900 transition-colors group">
+            <div className="flex justify-between items-start mb-4">
+              <span className="text-xs font-mono text-zinc-500 group-hover:text-white transition-colors">TOTAL_ORDERS</span>
+              <ShoppingCartIcon className="h-4 w-4 text-zinc-600" />
+            </div>
+            <p className="text-4xl font-bold font-mono">{stats.totalOrders.toString().padStart(2, '0')}</p>
+          </div>
+
+          {/* Stat 3 */}
+          <div className="p-8 border-b md:border-r-0 lg:border-r border-zinc-800 hover:bg-zinc-900 transition-colors group">
+            <div className="flex justify-between items-start mb-4">
+              <span className="text-xs font-mono text-zinc-500 group-hover:text-white transition-colors">ACTIVE_USERS</span>
+              <UsersIcon className="h-4 w-4 text-zinc-600" />
+            </div>
+            <p className="text-4xl font-bold font-mono">{stats.totalUsers.toString().padStart(2, '0')}</p>
+          </div>
+
+          {/* Stat 4 */}
+          <div className="p-8 border-zinc-800 hover:bg-zinc-900 transition-colors group">
+            <div className="flex justify-between items-start mb-4">
+              <span className="text-xs font-mono text-zinc-500 group-hover:text-white transition-colors">REVENUE (INR)</span>
+              <Activity className="h-4 w-4 text-zinc-600" />
+            </div>
+            <p className="text-4xl font-bold font-mono text-white">₹{stats.totalRevenue.toLocaleString()}</p>
           </div>
         </div>
 
-        <div className="card p-6">
-          <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <ShoppingCartIcon className="h-6 w-6 text-green-600" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          
+          {/* Recent Products */}
+          <section>
+            <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-4">
+              <h2 className="text-xl font-bold uppercase tracking-tight flex items-center gap-3">
+                <PackageIcon className="h-5 w-5 text-zinc-500" />
+                Inventory Log
+              </h2>
+              <span className="text-xs font-mono text-zinc-500">LATEST_ENTRIES</span>
             </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-600">Total Orders</p>
-              <p className="text-2xl font-bold">{stats.totalOrders}</p>
-            </div>
-          </div>
-        </div>
 
-        <div className="card p-6">
-          <div className="flex items-center">
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <UsersIcon className="h-6 w-6 text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold">{stats.totalUsers}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="card p-6">
-          <div className="flex items-center">
-            <div className="p-3 bg-orange-100 rounded-lg">
-              <IndianRupeeIcon className="h-6 w-6 text-orange-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold">₹{stats.totalRevenue}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Products */}
-        <div className="card p-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
-            <PackageIcon className="h-5 w-5 mr-2" />
-            Recent Products
-          </h2>
-          <div className="space-y-4">
-            {products.map((product) => (
-              <div key={product._id} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center">
-                  <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded" />
-                  <div className="ml-3">
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-sm text-gray-600">₹{product.price}</p>
+            <div className="space-y-1">
+              {products.map((product) => (
+                <div key={product._id} className="group flex items-center justify-between p-4 border border-zinc-800/50 bg-zinc-900/20 hover:bg-zinc-900 hover:border-zinc-700 transition-all">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-zinc-800 overflow-hidden">
+                      <img src={product.image} alt={product.name} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm uppercase tracking-wide">{product.name}</p>
+                      <p className="text-xs font-mono text-zinc-500 mt-1">₹{product.price} // STOCK: {product.stock}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      className="p-2 hover:bg-white hover:text-black border border-zinc-700 transition-colors"
+                    >
+                      <EditIcon className="h-3 w-3" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product._id)}
+                      className="p-2 hover:bg-red-600 hover:text-white hover:border-red-600 border border-zinc-700 transition-colors"
+                    >
+                      <TrashIcon className="h-3 w-3" />
+                    </button>
                   </div>
                 </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleEditProduct(product)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                  >
-                    <EditIcon className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProduct(product._id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded"
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </section>
 
-        {/* Recent Orders */}
-        <div className="card p-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
-            <ShoppingCartIcon className="h-5 w-5 mr-2" />
-            Recent Orders
-          </h2>
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <div key={order._id} className="p-3 border rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <p className="font-medium">Order #{order._id.slice(-8).toUpperCase()}</p>
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    order.orderStatus === 'delivered' ? 'bg-green-100 text-green-600' :
-                    order.orderStatus === 'shipped' ? 'bg-blue-100 text-blue-600' :
-                    'bg-yellow-100 text-yellow-600'
-                  }`}>
-                    {order.orderStatus}
-                  </span>
+          {/* Recent Orders */}
+          <section>
+            <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-4">
+              <h2 className="text-xl font-bold uppercase tracking-tight flex items-center gap-3">
+                <ShoppingCartIcon className="h-5 w-5 text-zinc-500" />
+                Transaction Log
+              </h2>
+              <span className="text-xs font-mono text-zinc-500">RECENT_ACTIVITY</span>
+            </div>
+
+            <div className="space-y-1">
+              {orders.map((order) => (
+                <div key={order._id} className="p-4 border border-zinc-800/50 bg-zinc-900/20 hover:bg-zinc-900 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono bg-zinc-800 px-1.5 py-0.5 text-zinc-400">#{order._id.slice(-6).toUpperCase()}</span>
+                    </div>
+                    <div className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider border ${
+                      order.orderStatus === 'delivered' ? 'border-green-900 text-green-500 bg-green-900/10' :
+                      order.orderStatus === 'shipped' ? 'border-blue-900 text-blue-500 bg-blue-900/10' :
+                      'border-yellow-900 text-yellow-500 bg-yellow-900/10'
+                    }`}>
+                      {order.orderStatus}
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-end">
+                    <p className="text-xs text-zinc-500 font-mono">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </p>
+                    <p className="font-mono font-bold">₹{order.totalAmount}</p>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600">
-                  ₹{order.totalAmount} • {new Date(order.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
 
-      {/* Product Form Modal */}
+      {/* Modal Overlay */}
       {showProductForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-    <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all duration-300 scale-100 hover:scale-[1.01] relative">
-      
-      {/* Close Button */}
-      <button
-        onClick={() => {
-          setShowProductForm(false);
-          setEditingProduct(null);
-        }}
-        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition"
-      >
-        <X className="w-6 h-6" />
-      </button>
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-black border border-zinc-700 w-full max-w-xl shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-6 border-b border-zinc-800 bg-zinc-900/30">
+              <h2 className="text-lg font-bold uppercase tracking-widest flex items-center gap-2">
+                {editingProduct ? '>> UPDATE_DATABASE' : '>> INITIALIZE_PRODUCT'}
+              </h2>
+              <button
+                onClick={() => {
+                  setShowProductForm(false);
+                  setEditingProduct(null);
+                }}
+                className="text-zinc-500 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-      {/* Header */}
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 border-b pb-3 flex items-center justify-center gap-2">
-        {editingProduct ? (
-          <>
-            <Edit className="w-6 h-6 text-orange-500" />
-            Edit Product
-          </>
-        ) : (
-          <>
-            <PlusCircle className="w-6 h-6 text-orange-500" />
-            Add New Product
-          </>
-        )}
-      </h2>
+            {/* Modal Body */}
+            <form onSubmit={handleProductSubmit} className="p-6 md:p-8 space-y-6 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-800">
+              
+              <div className="space-y-6">
+                <div>
+                  <label className={labelClass}>Product Designation</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={productForm.name}
+                      onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                      className={inputClass}
+                      placeholder="ENTER NAME"
+                      required
+                    />
+                    <Package className="absolute right-2 top-3 w-4 h-4 text-zinc-700" />
+                  </div>
+                </div>
 
-      {/* Form */}
-      <form onSubmit={handleProductSubmit} className="space-y-5">
-        
-        {/* Product Name */}
-        <div className="flex items-center gap-2">
-          <Package className="w-5 h-5 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Product Name"
-            value={productForm.name}
-            onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
-            required
-          />
+                <div>
+                  <label className={labelClass}>Specifications</label>
+                  <div className="relative">
+                    <textarea
+                      value={productForm.description}
+                      onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                      className={`${inputClass} min-h-[80px] resize-none`}
+                      placeholder="ENTER DETAILS"
+                      rows="3"
+                      required
+                    />
+                    <FileText className="absolute right-2 top-3 w-4 h-4 text-zinc-700" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className={labelClass}>Unit Cost (INR)</label>
+                    <input
+                      type="number"
+                      value={productForm.price}
+                      onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                      className={inputClass}
+                      placeholder="0.00"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Inventory Count</label>
+                    <input
+                      type="number"
+                      value={productForm.stock}
+                      onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })}
+                      className={inputClass}
+                      placeholder="0"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Asset URL</label>
+                  <div className="relative">
+                    <input
+                      type="url"
+                      value={productForm.image}
+                      onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                      className={inputClass}
+                      placeholder="HTTPS://"
+                      required
+                    />
+                    <ImageIcon className="absolute right-2 top-3 w-4 h-4 text-zinc-700" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Category Tag</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={productForm.category}
+                      onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                      className={inputClass}
+                      placeholder="CATEGORY"
+                      required
+                    />
+                    <Tag className="absolute right-2 top-3 w-4 h-4 text-zinc-700" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 flex gap-4">
+                <button
+                  type="submit"
+                  className="flex-1 bg-white text-black hover:bg-zinc-200 font-bold uppercase tracking-widest py-4 transition-colors flex items-center justify-center gap-2 text-sm"
+                >
+                  {editingProduct ? 'Overwrite Data' : 'Execute Creation'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProductForm(false);
+                    setEditingProduct(null);
+                  }}
+                  className="flex-1 bg-transparent border border-zinc-800 text-zinc-400 hover:text-white hover:border-white font-bold uppercase tracking-widest py-4 transition-all text-sm"
+                >
+                  Abort
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-
-        {/* Description */}
-        <div className="flex items-start gap-2">
-          <FileText className="w-5 h-5 text-gray-500 mt-2" />
-          <textarea
-            placeholder="Description"
-            value={productForm.description}
-            onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
-            rows="3"
-            required
-          />
-        </div>
-
-        {/* Price */}
-        <div className="flex items-center gap-2">
-          <IndianRupeeIcon className="w-5 h-5 text-gray-500" />
-          <input
-            type="number"
-            placeholder="Price"
-            value={productForm.price}
-            onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
-            required
-          />
-        </div>
-
-        {/* Image URL */}
-        <div className="flex items-center gap-2">
-          <ImageIcon className="w-5 h-5 text-gray-500" />
-          <input
-            type="url"
-            placeholder="Image URL"
-            value={productForm.image}
-            onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
-            required
-          />
-        </div>
-
-        {/* Category */}
-        <div className="flex items-center gap-2">
-          <Tag className="w-5 h-5 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Category"
-            value={productForm.category}
-            onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
-            required
-          />
-        </div>
-
-        {/* Stock */}
-        <div className="flex items-center gap-2">
-          <Layers className="w-5 h-5 text-gray-500" />
-          <input
-            type="number"
-            placeholder="Stock"
-            value={productForm.stock}
-            onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
-            required
-          />
-        </div>
-
-        {/* Buttons */}
-        <div className="flex space-x-4 pt-4">
-          <button
-            type="submit"
-            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg py-2 shadow-md flex items-center justify-center gap-2 transition-transform duration-200 hover:scale-105"
-          >
-            {editingProduct ? (
-              <>
-                <Edit className="w-4 h-4" /> Update Product
-              </>
-            ) : (
-              <>
-                <PlusCircle className="w-4 h-4" /> Create Product
-              </>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setShowProductForm(false);
-              setEditingProduct(null);
-            }}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg py-2 shadow-md flex items-center justify-center gap-2 transition-transform duration-200 hover:scale-105"
-          >
-            <X className="w-4 h-4" /> Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
       )}
     </div>
   );

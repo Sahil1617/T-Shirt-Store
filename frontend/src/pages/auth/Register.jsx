@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { EyeIcon, EyeOffIcon, UserIcon, MailIcon, LockIcon } from 'lucide-react';
+import { 
+  ArrowRight, 
+  ShieldAlert, 
+  CheckCircle,
+  Zap
+} from 'lucide-react';
 import Lightning from './Lightning';
 import { useAuth } from '../../context/AuthContext';
 
@@ -22,7 +27,6 @@ const Register = () => {
       [e.target.name]: e.target.value
     });
     
-    // Clear password error when user types
     if (e.target.name === 'confirmPassword' && passwordError) {
       setPasswordError('');
     }
@@ -30,11 +34,11 @@ const Register = () => {
 
   const validatePassword = () => {
     if (formData.password !== formData.confirmPassword) {
-      setPasswordError('Passwords do not match');
+      setPasswordError('PASSWORDS_DO_NOT_MATCH');
       return false;
     }
     if (formData.password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
+      setPasswordError('PASSWORD_TOO_SHORT (MIN 6 CHARS)');
       return false;
     }
     setPasswordError('');
@@ -49,154 +53,176 @@ const Register = () => {
     navigate('/');
   };
 
+  // --- STYLES ---
+  const inputClass = "w-full bg-transparent border-b border-zinc-700 text-white p-4 focus:border-white focus:outline-none transition-all duration-300 font-mono placeholder-zinc-800 text-sm";
+  const labelClass = "text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold mb-1 block group-focus-within/field:text-white transition-colors";
+
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
-      {/* Lightning Background */}
-      <div className="absolute inset-0 z-0">
+    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden px-4 py-12">
+      
+      {/* --- BACKGROUND LAYERS --- */}
+      <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
         <Lightning
-          hue={280}
+          hue={280} // Purple hue for Registration
           xOffset={0}
           speed={0.8}
-          intensity={0.6}
-          size={1}
+          intensity={0.5}
+          size={1.2}
         />
       </div>
 
-      {/* Dark Overlay for Better Contrast */}
-      <div className="absolute inset-0 bg-black/30 z-1"></div>
+      {/* Technical Grid Overlay */}
+      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+      
+      {/* Vignette */}
+      <div className="absolute inset-0 bg-radial-gradient(circle, transparent 20%, black 100%) pointer-events-none z-0"></div>
 
-      {/* Register Form */}
-      <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-xl shadow-2xl p-8 space-y-8 relative z-10">
+      {/* --- MAIN CONTENT --- */}
+      <div className="w-full max-w-md relative z-10">
         
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">Create account</h2>
-          <p className="mt-2 text-sm text-gray-600">Join us today</p>
-        </div>
-
-        {(error || passwordError) && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md text-center">
-            {error || passwordError}
-          </div>
-        )}
-
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="bg-black/70 backdrop-blur-md border border-white/10 p-8 sm:p-12 relative overflow-hidden">
           
-          {/* Name Field */}
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
-            <div className="mt-1 relative">
-              <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          {/* Decorative Icon */}
+          <div className="absolute top-0 right-0 p-4 opacity-50">
+             <Zap className="w-4 h-4 text-purple-400" />
+          </div>
+
+          {/* Header */}
+          <div className="mb-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-2 h-2 bg-purple-500 animate-pulse"></div>
+              <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest">New_User_Protocol</span>
+            </div>
+            <h1 className="text-5xl font-black text-white uppercase tracking-tighter leading-[0.9]">
+              Join<br />System
+            </h1>
+          </div>
+
+          {/* Errors */}
+          {(error || passwordError) && (
+            <div className="mb-8 border-l-2 border-red-500 bg-red-900/20 p-4 flex items-start gap-3 animate-in fade-in slide-in-from-left-2">
+              <ShieldAlert className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider mb-1">Validation Error</p>
+                <p className="text-xs text-red-300 font-mono">{error || passwordError}</p>
+              </div>
+            </div>
+          )}
+
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            
+            {/* Name Field */}
+            <div className="group/field">
+              <label htmlFor="name" className={labelClass}>
+                Full Name
+              </label>
               <input
                 id="name"
                 name="name"
                 type="text"
                 required
-                className="input-field block w-full rounded-lg border border-gray-300 px-10 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                placeholder="Enter your full name"
+                className={inputClass}
+                placeholder="ENTER NAME"
                 value={formData.name}
                 onChange={handleChange}
               />
             </div>
-          </div>
 
-          {/* Email Field */}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email address
-            </label>
-            <div className="mt-1 relative">
-              <MailIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            {/* Email Field */}
+            <div className="group/field">
+              <label htmlFor="email" className={labelClass}>
+                Email
+              </label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 required
-                className="input-field block w-full rounded-lg border border-gray-300 px-10 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                placeholder="Enter your email"
+                className={inputClass}
+                placeholder="USER@DOMAIN.COM"
                 value={formData.email}
                 onChange={handleChange}
               />
             </div>
-          </div>
 
-          {/* Password Field */}
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <div className="mt-1 relative">
-              <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            {/* Password Field */}
+            <div className="group/field">
+              <div className="flex justify-between items-end mb-1">
+                 <label htmlFor="password" className={labelClass}>
+                   Set Security Key
+                 </label>
+                 <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-[9px] font-mono text-zinc-500 hover:text-white uppercase tracking-wider transition-colors"
+                  >
+                    {showPassword ? '[ HIDE ]' : '[ SHOW ]'}
+                  </button>
+              </div>
               <input
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
                 required
-                className="input-field block w-full rounded-lg border border-gray-300 px-10 py-3 pr-10 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                placeholder="Create a password (min. 6 characters)"
+                className={inputClass}
+                placeholder="MIN 6 CHARACTERS"
                 value={formData.password}
                 onChange={handleChange}
               />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOffIcon className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <EyeIcon className="h-5 w-5 text-gray-400" />
+            </div>
+
+            {/* Confirm Password Field */}
+            <div className="group/field">
+              <label htmlFor="confirmPassword" className={labelClass}>
+                Verify Security Key
+              </label>
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className={inputClass}
+                  placeholder="REPEAT PASSWORD"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                />
+                {/* Success Indicator if matches and not empty */}
+                {formData.confirmPassword && formData.password === formData.confirmPassword && (
+                  <CheckCircle className="absolute right-2 top-4 w-4 h-4 text-green-500" />
                 )}
-              </button>
-            </div>
-          </div>
-
-          {/* Confirm Password Field */}
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-              Confirm Password
-            </label>
-            <div className="mt-1 relative">
-              <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type={showPassword ? "text" : "password"}
-                required
-                className="input-field block w-full rounded-lg border border-gray-300 px-10 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 text-lg font-semibold text-white rounded-lg shadow-md bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 transition-all duration-300 transform hover:scale-[1.02]"
-          >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Creating account...
               </div>
-            ) : (
-              'Create account'
-            )}
-          </button>
-        </form>
+            </div>
 
-        {/* Login Link */}
-        <div className="text-center pt-4 border-t border-gray-200">
-          <p className="text-sm text-gray-600">
-            Already have an account?{' '}
-            <Link to="/login" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
-              Sign in
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white text-black py-5 font-bold uppercase tracking-widest hover:bg-zinc-200 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3 mt-8 relative overflow-hidden group/btn"
+            >
+              <div className="absolute inset-0 bg-purple-500/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out pointer-events-none"></div>
+              <span className="relative flex items-center gap-2">
+                {loading ? (
+                  <span className="w-4 h-4 border-2 border-zinc-400 border-t-black rounded-full animate-spin" />
+                ) : (
+                  <>
+                    Initialize Account <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </span>
+            </button>
+          </form>
+
+          {/* Footer */}
+          <div className="mt-10 pt-6 border-t border-white/10 flex justify-between items-center">
+            <span className="text-zinc-600 text-[10px] font-mono uppercase">Existing User?</span>
+            <Link 
+              to="/login" 
+              className="text-white font-bold uppercase tracking-wider text-xs border-b border-transparent hover:border-white transition-all pb-0.5"
+            >
+              Access Login
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     </div>

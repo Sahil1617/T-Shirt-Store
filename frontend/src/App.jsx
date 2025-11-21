@@ -25,7 +25,12 @@ function App() {
       <CartProvider>
         <DebugAuth/>
         <Router>
-          <div className="min-h-screen bg-gray-50 flex flex-col">
+          {/* 
+            Updated Main Container: 
+            - bg-black: Forces dark mode base
+            - selection: Custom text highlight color (Editorial style)
+          */}
+          <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black flex flex-col">
             <Navbar />
             <main className="flex-grow">
               <Routes>
@@ -45,20 +50,34 @@ function App() {
               </Routes>
             </main>
             <Footer />
+            
+            {/* 
+              Updated Toaster: 
+              - Square corners (borderRadius: 0)
+              - Monospace font
+              - High contrast borders
+            */}
             <Toaster
-              position="top-center"
+              position="bottom-right"
               toastOptions={{
                 duration: 4000,
+                className: '!bg-black !text-white !font-mono !uppercase !text-xs !tracking-widest !rounded-none !border !border-zinc-800',
                 style: {
-                  background: '#363636',
+                  background: '#000',
                   color: '#fff',
+                  border: '1px solid #333',
+                  borderRadius: '0px',
+                  padding: '16px 24px',
+                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
                 },
                 success: {
-                  duration: 3000,
                   iconTheme: {
-                    primary: '#10b981',
-                    secondary: '#fff',
+                    primary: '#fff',
+                    secondary: '#000',
                   },
+                  style: {
+                    border: '1px solid #22c55e', // Green border for success
+                  }
                 },
                 error: {
                   duration: 5000,
@@ -66,6 +85,9 @@ function App() {
                     primary: '#ef4444',
                     secondary: '#fff',
                   },
+                  style: {
+                    border: '1px solid #ef4444', // Red border for error
+                  }
                 },
               }}
             />

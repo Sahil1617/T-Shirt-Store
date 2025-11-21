@@ -1,23 +1,24 @@
 import { useState, useEffect } from 'react';
 import { 
-  PackageIcon, 
-  CalendarIcon, 
-  IndianRupeeIcon, 
-  MapPinIcon,
-  PhoneIcon,
-  TruckIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  ShoppingBag
+  Package, 
+  Calendar, 
+  MapPin, 
+  Truck, 
+  ArrowRight, 
+  ShoppingBag,
+  ChevronRight,
+  CreditCard,
+  Copy
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/axios';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedOrder, setExpandedOrder] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -27,13 +28,9 @@ const Orders = () => {
   const fetchOrders = async () => {
     try {
       const response = await api.get('/api/orders/my-orders');
-      console.log('Orders data received:', response.data);
-      
-      if (response.data.length > 0 && response.data[0].items.length > 0) {
-        console.log('First item structure:', response.data[0].items[0]);
-      }
-      
-      setOrders(response.data);
+      // Sort orders by date (newest first) if not already
+      const sortedOrders = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setOrders(sortedOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
@@ -41,298 +38,245 @@ const Orders = () => {
     }
   };
 
+  // Bespoke status styling - Minimalist dots/text
   const getStatusConfig = (status) => {
     const statusLower = status?.toLowerCase();
     switch (statusLower) {
       case 'delivered':
-        return {
-          color: 'text-green-700 bg-green-50 border-green-200',
-          dotColor: 'bg-green-500',
-          icon: CheckCircleIcon,
-          label: 'Delivered'
-        };
+        return { color: 'bg-emerald-500', text: 'text-emerald-500', label: 'Delivered' };
       case 'shipped':
-        return {
-          color: 'text-blue-700 bg-blue-50 border-blue-200',
-          dotColor: 'bg-blue-500',
-          icon: TruckIcon,
-          label: 'Shipped'
-        };
+        return { color: 'bg-blue-500', text: 'text-blue-500', label: 'In Transit' };
       case 'processing':
-        return {
-          color: 'text-amber-700 bg-amber-50 border-amber-200',
-          dotColor: 'bg-amber-500',
-          icon: ClockIcon,
-          label: 'Processing'
-        };
+        return { color: 'bg-zinc-500', text: 'text-zinc-400', label: 'Processing' };
       case 'cancelled':
-        return {
-          color: 'text-red-700 bg-red-50 border-red-200',
-          dotColor: 'bg-red-500',
-          icon: XCircleIcon,
-          label: 'Cancelled'
-        };
+        return { color: 'bg-red-500', text: 'text-red-500', label: 'Cancelled' };
       default:
-        return {
-          color: 'text-gray-700 bg-gray-50 border-gray-200',
-          dotColor: 'bg-gray-500',
-          icon: PackageIcon,
-          label: status
-        };
+        return { color: 'bg-zinc-500', text: 'text-zinc-500', label: status };
     }
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
     });
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    // Optional: Add toast here
+  };
+
+  const toggleDetails = (orderId) => {
+    setExpandedOrder(expandedOrder === orderId ? null : orderId);
+  };
+
+  // --- Loading State ---
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
-          <div className="animate-pulse space-y-8">
-            <div className="space-y-3">
-              <div className="h-10 bg-gray-200 rounded-md w-56"></div>
-              <div className="h-5 bg-gray-100 rounded w-72"></div>
-            </div>
-            {[...Array(2)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div className="h-24 bg-gray-100 rounded-t-xl"></div>
-                <div className="p-8 space-y-6">
-                  <div className="h-5 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-5 bg-gray-100 rounded w-1/2"></div>
-                  <div className="h-32 bg-gray-100 rounded-lg"></div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-t-2 border-white rounded-full animate-spin"></div>
+          <p className="text-zinc-500 text-xs font-mono uppercase tracking-widest">Loading Data</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
-        
-        {/* Page Header */}
-        <div className="mb-10">
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-3">
-            Order History
-          </h1>
-          <p className="text-base lg:text-lg text-gray-600">
-            Track and manage all your orders
-          </p>
-        </div>
-
-        {orders.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="px-8 py-16 sm:px-12 sm:py-20 text-center">
-              <div className="max-w-sm mx-auto">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <PackageIcon className="h-8 w-8 text-gray-400" />
-                </div>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                  No orders yet
-                </h2>
-                <p className="text-gray-600 mb-8 leading-relaxed">
-                  When you place your first order, it will appear here.
-                </p>
-                <Link
-                  to="/products"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors duration-200"
-                >
-                  Start Shopping
-                </Link>
-              </div>
+    <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black pb-24">
+      
+      {/* --- Header Section --- */}
+      <div className="sticky top-0 z-30 bg-black/80 backdrop-blur-xl border-b border-zinc-900">
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div>
+              <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white mb-2">
+                Orders
+              </h1>
+              <p className="text-zinc-500 font-mono text-xs uppercase tracking-widest">
+                {orders.length} Transactions Found // {user?.email}
+              </p>
             </div>
+            <Link to="/products" className="group flex items-center gap-2 text-sm font-bold hover:text-zinc-300 transition-colors">
+              New Drop <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
+        {orders.length === 0 ? (
+          // --- Empty State ---
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-zinc-800 rounded-3xl"
+          >
+            <div className="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mb-6">
+              <ShoppingBag className="h-8 w-8 text-zinc-600" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">No Purchase History</h2>
+            <p className="text-zinc-500 mb-8 font-mono text-sm">You haven't copped anything yet.</p>
+            <Link
+              to="/products"
+              className="px-8 py-3 bg-white text-black font-bold rounded-lg hover:bg-zinc-200 transition-all"
+            >
+              Shop Now
+            </Link>
+          </motion.div>
         ) : (
-          <div className="space-y-6 lg:space-y-8">
-            {orders.map((order) => {
-              const statusConfig = getStatusConfig(order.orderStatus);
-              const StatusIcon = statusConfig.icon;
+          // --- Orders List ---
+          <div className="space-y-4">
+            {orders.map((order, index) => {
+              const status = getStatusConfig(order.orderStatus);
+              const isExpanded = expandedOrder === order._id;
 
               return (
-                <div
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
                   key={order._id}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
+                  className={`group bg-zinc-950 border transition-all duration-300 rounded-2xl overflow-hidden ${
+                    isExpanded ? 'border-zinc-700 ring-1 ring-zinc-700' : 'border-zinc-900 hover:border-zinc-800'
+                  }`}
                 >
-                  {/* Order Header */}
-                  <div className="bg-gray-50 border-b border-gray-200 px-6 lg:px-8 py-5">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                      <div className="space-y-1">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          Order #{order._id.slice(-8).toUpperCase()}
-                        </h3>
-                        <p className="text-sm text-gray-600 flex items-center gap-1.5">
-                          <CalendarIcon className="h-4 w-4 text-gray-400" />
-                          {formatDate(order.createdAt)}
-                        </p>
+                  {/* --- Card Header (Clickable) --- */}
+                  <div 
+                    onClick={() => toggleDetails(order._id)}
+                    className="cursor-pointer p-6 flex flex-col md:flex-row gap-6 md:items-center justify-between"
+                  >
+                    {/* Left: ID & Date */}
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-zinc-900 rounded-xl">
+                        <Package className="w-6 h-6 text-white" />
                       </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-lg text-white tracking-tight">#{order._id.slice(-6).toUpperCase()}</span>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); copyToClipboard(order._id); }}
+                            className="text-zinc-600 hover:text-white transition-colors"
+                          >
+                            <Copy className="w-3 h-3" />
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-zinc-500 font-mono uppercase">
+                          <span>{formatDate(order.createdAt)}</span>
+                          <span className="w-1 h-1 bg-zinc-800 rounded-full"></span>
+                          <span>{order.items.length} Item{order.items.length > 1 && 's'}</span>
+                        </div>
+                      </div>
+                    </div>
 
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${statusConfig.dotColor}`}></span>
-                        <span className={`
-                          inline-flex items-center gap-2 px-4 py-2 rounded-lg 
-                          text-sm font-semibold border
-                          ${statusConfig.color}
-                        `}>
-                          <StatusIcon className="h-4 w-4" />
-                          {statusConfig.label}
-                        </span>
-                      </div>
+                    {/* Right: Status & Price */}
+                    <div className="flex items-center justify-between md:justify-end gap-6 md:gap-12 border-t md:border-t-0 border-zinc-900 pt-4 md:pt-0 mt-2 md:mt-0">
+                       <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${status.color} animate-pulse`}></div>
+                          <span className={`text-sm font-bold ${status.text}`}>{status.label}</span>
+                       </div>
+                       
+                       <div className="text-right">
+                          <span className="block font-mono text-xl font-bold text-white">
+                            ₹{order.totalAmount?.toFixed(2)}
+                          </span>
+                       </div>
+
+                       <ChevronRight className={`w-5 h-5 text-zinc-600 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
                     </div>
                   </div>
 
-                  <div className="px-6 lg:px-8 py-6 lg:py-8">
-                    {/* Order Summary Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6 mb-8">
-                      <div className="bg-gray-50 rounded-lg p-4 lg:p-5">
-                        <div className="flex items-center gap-3 mb-2">
-                          <PackageIcon className="h-5 w-5 text-gray-500" />
-                          <p className="text-sm font-medium text-gray-600">Total Items</p>
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {order.items.reduce((total, item) => total + item.quantity, 0)}
-                        </p>
-                      </div>
-
-                      <div className="bg-primary-50 rounded-lg p-4 lg:p-5">
-                        <div className="flex items-center gap-3 mb-2">
-                          <IndianRupeeIcon className="h-5 w-5 text-primary-600" />
-                          <p className="text-sm font-medium text-primary-700">Total Amount</p>
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900">
-                          ₹{order.totalAmount?.toFixed(2) || '0.00'}
-                        </p>
-                      </div>
-
-                      <div className="bg-blue-50 rounded-lg p-4 lg:p-5">
-                        <div className="flex items-center gap-3 mb-2">
-                          <CalendarIcon className="h-5 w-5 text-blue-600" />
-                          <p className="text-sm font-medium text-blue-700">Order Date</p>
-                        </div>
-                        <p className="text-lg font-bold text-gray-900">
-                          {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Items Section */}
-                    <div className="mb-8">
-                      <h4 className="text-base font-semibold text-gray-900 mb-5 pb-2 border-b border-gray-200">
-                        Order Items ({order.items.length})
-                      </h4>
-                      
-                      <div className="space-y-4">
-                        {order.items.map((item, index) => {
-                          console.log(`Item ${index} data:`, item);
-                          const displaySize = item.size || item.selectedSize || item.product?.size || 'N/A';
-
-                          return (
-                            <div
-                              key={`${item.product?._id || item._id}-${index}`}
-                              className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all duration-200"
-                            >
-                              {/* Product Image */}
-                              <div className="flex-shrink-0">
-                                <img
-                                  src={item.product?.image || '/placeholder-product.jpg'}
-                                  alt={item.product?.name || 'Product'}
-                                  className="w-24 h-24 object-cover rounded-lg border border-gray-200"
-                                  onError={(e) => {
-                                    e.target.src = '/placeholder-product.jpg';
-                                  }}
-                                />
-                              </div>
-                              
-                              {/* Product Details */}
-                              <div className="flex-1 min-w-0">
-                                <h5 className="font-semibold text-gray-900 mb-2 line-clamp-1">
-                                  {item.product?.name || 'Product Not Available'}
-                                </h5>
-                                
-                                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="text-gray-500">Size:</span>
-                                    <span className="font-medium text-gray-900">{displaySize}</span>
-                                  </div>
-                                  
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="text-gray-500">Qty:</span>
-                                    <span className="font-medium text-gray-900">{item.quantity}</span>
-                                  </div>
-                                  
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="text-gray-500">Price:</span>
-                                    <span className="font-medium text-gray-900">₹{item.price?.toFixed(2) || '0.00'}</span>
-                                  </div>
+                  {/* --- Expanded Details --- */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="border-t border-zinc-900 bg-zinc-900/30">
+                          
+                          {/* Items Grid */}
+                          <div className="p-6 space-y-4">
+                            {order.items.map((item, idx) => (
+                              <div key={idx} className="flex gap-4 items-center">
+                                <div className="w-16 h-16 bg-zinc-800 rounded-lg overflow-hidden flex-shrink-0 border border-zinc-800">
+                                  <img 
+                                    src={item.product?.image} 
+                                    alt={item.product?.name}
+                                    className="w-full h-full object-cover opacity-80"
+                                  />
                                 </div>
-                              </div>
-
-                              {/* Subtotal */}
-                              <div className="sm:text-right sm:min-w-[120px]">
-                                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Subtotal</p>
-                                <p className="text-lg font-bold text-gray-900">
-                                  ₹{((item.price || 0) * (item.quantity || 0)).toFixed(2)}
-                                </p>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Shipping Address */}
-                    {order.shippingAddress && (
-                      <div className="border-t border-gray-200 pt-6">
-                        <h4 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                          <MapPinIcon className="h-5 w-5 text-gray-500" />
-                          Shipping Information
-                        </h4>
-                        <div className="bg-gray-50 rounded-lg p-5">
-                          <div className="grid sm:grid-cols-2 gap-6">
-                            <div className="space-y-3">
-                              <div>
-                                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1.5">Recipient Name</p>
-                                <p className="font-semibold text-gray-900">
-                                  {order.shippingAddress.name}
-                                </p>
-                              </div>
-                              {order.shippingAddress.phone && (
-                                <div>
-                                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1.5">Phone Number</p>
-                                  <p className="text-gray-900 flex items-center gap-1.5">
-                                    <PhoneIcon className="h-4 w-4 text-gray-400" />
-                                    {order.shippingAddress.phone}
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-white font-bold truncate">{item.product?.name}</h4>
+                                  <p className="text-zinc-500 text-xs font-mono mt-1">
+                                    SIZE: {item.size || 'N/A'} <span className="mx-2">/</span> QTY: {item.quantity}
                                   </p>
                                 </div>
-                              )}
-                            </div>
-                            
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1.5">Delivery Address</p>
-                              <div className="text-gray-900 space-y-1">
-                                <p>{order.shippingAddress.address}</p>
-                                <p>{order.shippingAddress.city}, {order.shippingAddress.state}</p>
-                                <p className="font-semibold">PIN: {order.shippingAddress.zipCode}</p>
+                                <div className="text-white font-mono text-sm">
+                                  ₹{(item.price * item.quantity).toFixed(2)}
+                                </div>
                               </div>
-                            </div>
+                            ))}
+                          </div>
+
+                          {/* Footer Info (Address & Summary) */}
+                          <div className="bg-black/40 p-6 grid md:grid-cols-2 gap-8 border-t border-zinc-900">
+                             
+                             {/* Shipping Info */}
+                             {order.shippingAddress && (
+                               <div>
+                                 <h5 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                    <Truck className="w-3 h-3" /> Shipping Details
+                                 </h5>
+                                 <div className="text-sm text-zinc-300 leading-relaxed">
+                                   <p className="text-white font-bold mb-1">{order.shippingAddress.name}</p>
+                                   <p>{order.shippingAddress.address}</p>
+                                   <p>{order.shippingAddress.city}, {order.shippingAddress.state}</p>
+                                   <p className="font-mono mt-1 text-zinc-500">{order.shippingAddress.zipCode}</p>
+                                   {order.shippingAddress.phone && (
+                                      <p className="mt-2 text-xs text-zinc-500 flex items-center gap-1">
+                                        <span className="uppercase">Contact:</span> {order.shippingAddress.phone}
+                                      </p>
+                                   )}
+                                 </div>
+                               </div>
+                             )}
+
+                             {/* Payment Summary */}
+                             <div>
+                                <h5 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                  <CreditCard className="w-3 h-3" /> Payment Summary
+                                </h5>
+                                <div className="space-y-2 text-sm">
+                                   <div className="flex justify-between text-zinc-400">
+                                      <span>Subtotal</span>
+                                      <span className="font-mono">₹{(order.totalAmount / 1.08).toFixed(2)}</span>
+                                   </div>
+                                   <div className="flex justify-between text-zinc-400">
+                                      <span>Tax (8%)</span>
+                                      <span className="font-mono">₹{(order.totalAmount - (order.totalAmount / 1.08)).toFixed(2)}</span>
+                                   </div>
+                                   <div className="flex justify-between text-zinc-400">
+                                      <span>Shipping</span>
+                                      <span className="text-white text-xs uppercase font-bold">Free</span>
+                                   </div>
+                                   <div className="border-t border-dashed border-zinc-800 pt-2 mt-2 flex justify-between items-center">
+                                      <span className="font-bold text-white">Total Paid</span>
+                                      <span className="font-mono text-lg text-white font-bold">₹{order.totalAmount.toFixed(2)}</span>
+                                   </div>
+                                </div>
+                             </div>
+
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     )}
-                  </div>
-                </div>
+                  </AnimatePresence>
+                </motion.div>
               );
             })}
           </div>
