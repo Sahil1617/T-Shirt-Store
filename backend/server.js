@@ -15,7 +15,7 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://tshirtstore-frontend.vercel.app',  // Add your actual frontend URL
+    'https://t-shirt-store-tau.vercel.app',  // Add your actual frontend URL
     '*'
   ],
   credentials: true
