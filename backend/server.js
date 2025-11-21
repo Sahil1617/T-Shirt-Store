@@ -13,7 +13,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Your frontend URL
+  origin: [
+    'http://localhost:5173',
+    'https://tshirtstore-frontend.vercel.app',  // Add your actual frontend URL
+    '*'
+  ],
   credentials: true
 }));
 
@@ -23,15 +27,14 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use('/api/user', require('./routes/userProfile'));
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/admin/auth', require('./routes/adminAuth')); // Admin auth routes
-app.use('/api/admin', require('./routes/admin')); // Admin management routes
+app.use('/api/admin/auth', require('./routes/adminAuth')); 
+app.use('/api/admin', require('./routes/admin')); 
 app.use('/api/products', require('./routes/products'));
 app.use('/api/cart', require('./routes/cart'));
 app.use('/api/orders', require('./routes/orders'));
 
-// Error handling middleware (should be last)
+// Error handling middleware
 app.use(require('./middleware/errorHandler'));
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ❗ DO NOT LISTEN — Serverless function will handle the request
+module.exports = app;
