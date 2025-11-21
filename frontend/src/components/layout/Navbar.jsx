@@ -152,7 +152,7 @@ const Navbar = () => {
                       <Link to="/profile" className="block px-3 py-2 text-xs font-mono text-zinc-400 hover:text-white hover:bg-zinc-900 uppercase">Profile</Link>
                       <Link to="/orders" className="block px-3 py-2 text-xs font-mono text-zinc-400 hover:text-white hover:bg-zinc-900 uppercase">Orders</Link>
                       {user.role === 'admin' && (
-                        <Link to="/admin/dashboard" className="block px-3 py-2 text-xs font-mono text-red-400 hover:text-red-300 hover:bg-zinc-900 uppercase">Admin</Link>
+                        <Link to="/admin/dashboard" className="block px-3 py-2 text-xs font-mono text-red-400 hover:text-blue-3 00 hover:bg-zinc-900 uppercase">Admin Dashboard</Link>
                       )}
                       <button onClick={handleLogout} className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-500 hover:text-white hover:bg-zinc-900 uppercase mt-2 border-t border-zinc-900">
                         Log Out

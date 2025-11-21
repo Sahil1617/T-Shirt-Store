@@ -5,7 +5,8 @@ import {
   Instagram, 
   ArrowRight,
   ArrowUpRight,
-  Minus
+  Minus,
+  Zap
 } from 'lucide-react';
 
 const Footer = () => {
@@ -145,6 +146,7 @@ const Footer = () => {
       <div className="bg-white text-black py-2">
         <div className="max-w-[1800px] mx-auto px-4 sm:px-8 flex flex-col md:flex-row justify-between items-center gap-2 text-[10px] font-mono uppercase font-bold tracking-widest">
           <p>© {currentYear} Inc. All Rights Reserved.</p>
+          <p>Developer: Sahil Jadhav</p>
           <div className="flex gap-6">
             <a href="#" className="hover:underline">Privacy</a>
             <a href="#" className="hover:underline">Terms</a>

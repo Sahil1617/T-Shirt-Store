@@ -59,7 +59,7 @@ const Login = () => {
 
 
       {/* --- MAIN CONTENT (Z-10) --- */}
-      <div className="w-full max-w-md relative z-10">
+      <div className="w-full max-w-md mt-10 relative z-10">
         
         {/* Glass Panel Container */}
         <div className="bg-black/70 backdrop-blur-md border border-white/10 p-8 sm:p-12 relative overflow-hidden group">

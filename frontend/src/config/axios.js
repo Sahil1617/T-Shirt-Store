@@ -5,7 +5,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   (window.location.hostname === "localhost"
     ? "http://localhost:5000"
-    : "https://sales-management-backend-a9vz.onrender.com");
+    : "");
 
 const api = axios.create({
   baseURL: API_BASE_URL,
