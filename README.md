@@ -3,7 +3,7 @@
 A full-stack e-commerce application for selling custom t-shirts, featuring a modern React frontend and a robust Node.js/Express backend with MongoDB.
 
 ## 🌐 View Live At:
-https://t-shirt-store-tau.vercel.app/
+https://t-shirt-store-ind.vercel.app/
 
 ## 🚀 Features
 
