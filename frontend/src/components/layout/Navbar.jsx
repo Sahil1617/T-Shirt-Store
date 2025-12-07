@@ -219,7 +219,7 @@ const Navbar = () => {
                 { to: "/products", label: "Shop", sub: "Latest Drops" },
                 { to: "/about", label: "Studio", sub: "Our Philosophy" },
                 { to: "/contact", label: "Contact", sub: "Get Help" },
-              ].map((item, i) => (
+              ].filter(Boolean).map((item, i) => (
                 <Link
                   key={item.to}
                   to={item.to}
@@ -242,21 +242,29 @@ const Navbar = () => {
             {/* Footer User Info */}
             <div className="p-6 bg-zinc-950 border-t border-zinc-900">
               {user ? (
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-[10px] font-mono text-zinc-500 uppercase mb-1">Currently logged in as</p>
-                    <p className="text-lg font-bold text-white">{user.name}</p>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-[10px] font-mono text-zinc-500 uppercase mb-1">Currently logged in as</p>
+                      <p className="text-lg font-bold text-white">{user.name}</p>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="p-3 bg-zinc-900 text-white hover:bg-white hover:text-black transition-colors">
+                        <UserIcon className="h-5 w-5" />
+                      </Link>
+                      <Link to="/orders" onClick={() => setIsMenuOpen(false)} className="p-3 bg-zinc-900 text-white hover:bg-white hover:text-black transition-colors">
+                        <ShoppingCartIcon className="h-5 w-5" />
+                      </Link>
+                      {user && user.role === 'admin' && (
+                        <Link to="/admin/dashboard" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-zinc-900 text-sm text-red-500 font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors">
+                          Dashboard
+                        </Link>
+                      )}
+                      <button onClick={handleLogout} className="p-3 bg-zinc-900 text-red-500 hover:bg-red-500 hover:text-white transition-colors">
+                        <ArrowRightIcon className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="p-3 bg-zinc-900 text-white hover:bg-white hover:text-black transition-colors">
-                      <UserIcon className="h-5 w-5" />
-                    </Link>
-                    <button onClick={handleLogout} className="p-3 bg-zinc-900 text-red-500 hover:bg-red-500 hover:text-white transition-colors">
-                      <ArrowRightIcon className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-              ) : (
+                ) : (
                 <div className="grid grid-cols-2 gap-4">
                   <Link to="/login" onClick={() => setIsMenuOpen(false)} className="py-4 text-center border border-zinc-800 text-white font-bold uppercase text-sm hover:bg-white hover:text-black transition-colors">
                     Login

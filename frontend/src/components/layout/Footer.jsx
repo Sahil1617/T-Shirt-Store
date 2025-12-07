@@ -76,16 +76,26 @@ const Footer = () => {
               
               {/* Section 1 */}
               <div>
-                <h4 className="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-6">Directory</h4>
+                <h4 className="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-6">
+                  Directory
+                </h4>
                 <ul className="space-y-4">
-                  {['Shop Collection', 'New Arrivals', 'About Studio', 'Journal'].map((link, i) => (
-                    <li key={i}>
-                      <Link to="/products" className="group flex items-center justify-between w-full text-lg font-bold uppercase tracking-tight hover:pl-2 transition-all duration-300">
-                        <span>{link}</span>
-                        <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                      </Link>
-                    </li>
-                  ))}
+                  {['Shop Collection', 'New Arrivals', 'About Studio', 'Journal'].map((link, i) => {
+                    let path = '/products'
+                    if (link === 'About Studio') path = '/about'
+                    if (link === 'Journal') path = '/journal'
+                    return (
+                      <li key={i}>
+                            <Link
+                              to={path}
+                              onClick={() => { if (typeof window !== 'undefined') window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); }}
+                              className="group flex items-center justify-between w-full text-lg font-bold uppercase tracking-tight hover:pl-2 transition-all duration-300">
+                              <span>{link}</span>
+                              <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </Link>
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
 
@@ -93,14 +103,20 @@ const Footer = () => {
               <div>
                 <h4 className="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-6">Support</h4>
                 <ul className="space-y-2">
-                  {['Order Status', 'Shipping & Returns', 'Size Guide', 'Contact Us'].map((link, i) => (
-                    <li key={i}>
-                      <Link to="/contact" className="text-sm text-zinc-400 hover:text-white transition-colors flex items-center gap-2 group">
-                        <Minus className="w-3 h-3 text-zinc-600 group-hover:text-white" />
-                        {link}
-                      </Link>
-                    </li>
-                  ))}
+                  {['Fabric & Care', 'Shipping & Returns', 'Size Guide', 'Contact Us'].map((link, i) => {
+                    let path = '/contact';
+                    if (link === 'Fabric & Care') path = '/fabric-care';
+                    if (link === 'Shipping & Returns') path = '/shipping-returns';
+                    if (link === 'Size Guide') path = '/size-guide';
+                    return (
+                      <li key={i}>
+                        <Link to={path} onClick={() => { if (typeof window !== 'undefined') window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); }} className="text-sm text-zinc-400 hover:text-white transition-colors flex items-center gap-2 group">
+                          <Minus className="w-3 h-3 text-zinc-600 group-hover:text-white" />
+                          {link}
+                        </Link>
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
             </div>
@@ -148,9 +164,8 @@ const Footer = () => {
           <p>© {currentYear} Inc. All Rights Reserved.</p>
           <p>Developer: Sahil Jadhav</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:underline">Privacy</a>
-            <a href="#" className="hover:underline">Terms</a>
-            <a href="#" className="hover:underline">Cookies</a>
+            <Link to="/privacy" onClick={() => { if (typeof window !== 'undefined') window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); }} className="hover:underline">Privacy</Link>
+            <Link to="/terms" onClick={() => { if (typeof window !== 'undefined') window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); }} className="hover:underline">Terms</Link>
           </div>
         </div>
       </div>

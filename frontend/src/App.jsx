@@ -16,8 +16,15 @@ import Register from './pages/auth/Register';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserProfile from './pages/UserProfile';
+import Journal from './pages/Journal';
 import Orders from './pages/Orders';
+import Privacy from './components/layout/Privacy';
+import Terms from './components/layout/Terms';
+import FabricCare from './components/layout/FabricCare';
+import Sizeguide from './components/layout/Sizeguide';
+import ShippingReturns from './components/layout/ShippingReturns';
 import DebugAuth from './components/DebugAuth';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
@@ -25,6 +32,7 @@ function App() {
       <CartProvider>
         <DebugAuth/>
         <Router>
+          <ScrollToTop />
           {/* 
             Updated Main Container: 
             - bg-black: Forces dark mode base
@@ -36,6 +44,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/journal" element={<Journal />} />
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
@@ -45,6 +54,11 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/orders" element={<Orders />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/fabric-care" element={<FabricCare />} />
+                <Route path="/size-guide" element={<Sizeguide />} />
+                <Route path="/shipping-returns" element={<ShippingReturns />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
               </Routes>
