@@ -49,7 +49,7 @@ const Navbar = () => {
     <>
       {/* 1. Announcement Ticker */}
       <div className="bg-zinc-900 text-zinc-400 text-[10px] font-mono uppercase tracking-widest py-2 px-4 text-center relative z-50 border-b border-zinc-800">
-        <span className="animate-pulse text-white">●</span> Free Worldwide Shipping on Orders Over ₹499
+        <span className="animate-pulse text-white">●</span> Free Shipping on Orders Over ₹499
       </div>
 
       {/* 2. Main Navbar */}
