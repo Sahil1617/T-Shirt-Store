@@ -1,18 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   CreditCard, 
   Lock, 
-  Truck, 
   ShieldCheck, 
   MapPin, 
   User, 
   ShoppingBag, 
   ArrowRight,
-  Calendar,
-  Check,
-  AlertCircle
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -22,6 +18,23 @@ const Checkout = () => {
   const { items, getCartTotal, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const buyNow = location.state?.buyNow;
+
+  const checkoutItems = buyNow
+    ? [
+        {
+          product: buyNow.product,
+          quantity: buyNow.quantity,
+          size: buyNow.size,
+        },
+      ]
+    : items;
+
+  const checkoutSubtotal = checkoutItems.reduce(
+    (sum, it) => sum + (it.product?.price || 0) * it.quantity,
+    0
+  );
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: user?.email || '',
@@ -51,25 +64,27 @@ const Checkout = () => {
 
     try {
       const orderData = {
-        items: items.map(item => ({
+        items: checkoutItems.map((item) => ({
           product: item.product._id,
           quantity: item.quantity,
           price: item.product.price,
           size: item.size,
         })),
-        totalAmount: getCartTotal() * 1.08, 
+        totalAmount: checkoutSubtotal * 1.08,
         shippingAddress: {
           name: `${formData.firstName} ${formData.lastName}`,
           address: formData.address,
           city: formData.city,
           state: formData.state,
           zipCode: formData.zipCode,
-          country: formData.country
-        }
+          country: formData.country,
+        },
       };
 
       await api.post('/api/orders', orderData);
-      clearCart();
+      if (!buyNow) {
+        clearCart();
+      }
       navigate('/orders?success=true');
     } catch (error) {
       console.error('Checkout error:', error);
@@ -86,7 +101,7 @@ const Checkout = () => {
   const sectionNumber = "font-mono text-zinc-600 text-xl opacity-50";
 
   // --- EMPTY STATE ---
-  if (items.length === 0) {
+  if (!buyNow && items.length === 0) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-6 relative overflow-hidden">
         {/* Background Noise Texture */}
@@ -120,7 +135,7 @@ const Checkout = () => {
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black font-sans pb-24">
       
       {/* Top Bar */}
-      <header className="border-b border-zinc-900 bg-black/50 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-zinc-900 bg-black/50 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
@@ -377,7 +392,7 @@ const Checkout = () => {
 
                 {/* Cart Items */}
                 <div className="space-y-4 mb-8 max-h-[300px] overflow-y-auto pr-2">
-                  {items.map((item) => (
+                  {checkoutItems.map((item) => (
                     <div key={`${item.product._id}-${item.size}`} className="flex justify-between items-start group">
                       <div className="flex gap-3">
                         <span className="font-mono text-xs text-zinc-400 pt-1">x{item.quantity}</span>
@@ -397,7 +412,7 @@ const Checkout = () => {
                 <div className="border-t border-black/10 border-dashed pt-6 space-y-2 font-mono text-sm">
                   <div className="flex justify-between">
                     <span className="text-zinc-500">SUBTOTAL</span>
-                    <span>₹{getCartTotal().toFixed(2)}</span>
+                    <span>₹{checkoutSubtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-500">SHIPPING</span>
@@ -405,7 +420,7 @@ const Checkout = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-500">TAX (8%)</span>
-                    <span>₹{(getCartTotal() * 0.08).toFixed(2)}</span>
+                    <span>₹{(checkoutSubtotal * 0.08).toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -413,7 +428,7 @@ const Checkout = () => {
                   <div className="flex justify-between items-end">
                     <span className="font-black text-xl uppercase tracking-tighter">Total Due</span>
                     <span className="font-mono text-3xl font-bold">
-                      ₹{(getCartTotal() * 1.08).toFixed(2)}
+                      ₹{(checkoutSubtotal * 1.08).toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -422,7 +437,7 @@ const Checkout = () => {
                   form="checkout-form"
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-black text-white py-5 font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors disabled:opacity-70 flex items-center justify-center gap-3"
+                  className="w-full bg-black cursor-pointer text-white py-5 font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors disabled:opacity-70 flex items-center justify-center gap-3"
                 >
                   {loading ? (
                     <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

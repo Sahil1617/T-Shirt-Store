@@ -67,7 +67,7 @@ const Cart = () => {
               <p className="text-xl font-bold text-white">{items.length} Items</p>
               <button 
                  onClick={clearCart}
-                 className="text-xs font-mono text-red-500 hover:text-red-400 uppercase tracking-wider mt-2 underline decoration-1 underline-offset-4"
+                 className="text-xs cursor-pointer font-mono text-red-500 hover:text-red-400 uppercase tracking-wider mt-2 underline decoration-1 underline-offset-4"
               >
                  Clear All
               </button>
@@ -124,7 +124,7 @@ const Cart = () => {
                          </div>
                          <button
                             onClick={() => removeFromCart(item.product._id, item.size)}
-                            className="text-[10px] font-bold uppercase text-zinc-500 hover:text-white text-left flex items-center gap-1"
+                            className="text-[10px] cursor-pointer font-bold uppercase text-zinc-500 hover:text-white text-left flex items-center gap-1"
                          >
                             <X className="w-3 h-3" /> Remove
                          </button>
@@ -136,7 +136,7 @@ const Cart = () => {
                        <div className="flex items-center border border-zinc-800">
                           <button
                              onClick={() => updateCartItem(item.product._id, Math.max(1, item.quantity - 1), item.size)}
-                             className="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-black transition-colors"
+                             className="w-8 h-8 cursor-pointer flex items-center justify-center hover:bg-white hover:text-black transition-colors"
                           >
                              <Minus className="w-3 h-3" />
                           </button>
@@ -145,7 +145,7 @@ const Cart = () => {
                           </span>
                           <button
                              onClick={() => updateCartItem(item.product._id, item.quantity + 1, item.size)}
-                             className="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-black transition-colors"
+                             className="w-8 h-8 cursor-pointer flex items-center justify-center hover:bg-white hover:text-black transition-colors"
                           >
                              <Plus className="w-3 h-3" />
                           </button>

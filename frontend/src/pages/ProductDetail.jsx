@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   StarIcon,
@@ -24,6 +24,7 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [size, setSize] = useState("");
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -60,6 +61,10 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     addToCart(product, quantity, size);
+  };
+
+  const handleBuyNow = () => {
+    navigate("/checkout", { state: { buyNow: { product, quantity, size } } });
   };
 
   const incrementQty = () =>
@@ -184,16 +189,16 @@ const ProductDetail = () => {
                   <span className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
                     Select Size
                   </span>
-                  <button className="text-xs text-purple-400 underline hover:text-purple-300">
+                  <Link to="/size-guide" className="text-xs text-purple-400 underline hover:text-purple-300">
                     Size Guide
-                  </button>
+                  </Link>
                 </div>
                 <div className="flex flex-wrap gap-2.5 sm:gap-3">
                   {product.sizes.map((s) => (
                     <button
                       key={s}
                       onClick={() => setSize(s)}
-                      className={`min-w-[2.75rem] sm:min-w-[3rem] h-10 sm:h-12 flex items-center justify-center rounded-xl border text-sm sm:text-base transition-all font-medium ${
+                      className={`min-w-[2.75rem] cursor-pointer sm:min-w-[3rem] h-10 sm:h-12 flex items-center justify-center rounded-xl border text-sm sm:text-base transition-all font-medium ${
                         size === s
                           ? "bg-white text-black border-white"
                           : "bg-zinc-900 text-gray-400 border-zinc-700 hover:border-gray-500"
@@ -212,7 +217,7 @@ const ProductDetail = () => {
               <div className="flex items-center bg-zinc-900 rounded-xl border border-zinc-700 w-full sm:w-auto">
                 <button
                   onClick={decrementQty}
-                  className="p-3 sm:p-4 hover:text-white text-gray-500 transition-colors"
+                  className="p-3 sm:p-4 cursor-pointer hover:text-white text-gray-500 transition-colors"
                 >
                   <MinusIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
@@ -221,7 +226,7 @@ const ProductDetail = () => {
                 </span>
                 <button
                   onClick={incrementQty}
-                  className="p-3 sm:p-4 hover:text-white text-gray-500 transition-colors"
+                  className="p-3 sm:p-4 cursor-pointer hover:text-white text-gray-500 transition-colors"
                 >
                   <PlusIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
@@ -233,16 +238,21 @@ const ProductDetail = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleAddToCart}
                 disabled={!product.stock}
-                className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-base sm:text-lg py-3.5 sm:py-4 px-6 sm:px-8 rounded-xl shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2.5 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-purple-900/50 transition-shadow"
+                className="flex-1 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-base sm:text-lg py-3.5 sm:py-4 px-6 sm:px-8 rounded-xl shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2.5 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-purple-900/50 transition-shadow"
               >
                 <ShoppingBagIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                 {product.stock ? "Add to Cart" : "Out of Stock"}
               </motion.button>
 
-              {/* Share */}
-              <button className="p-3 sm:p-4 bg-zinc-900 border border-zinc-700 rounded-xl hover:bg-zinc-800 hover:text-white text-gray-400 transition-colors">
-                <ShareIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleBuyNow}
+                disabled={!product.stock || (product.sizes && product.sizes.length > 0 && !size)}
+                className="bg-white cursor-pointer text-black font-bold text-base sm:text-lg py-3.5 sm:py-4 px-6 sm:px-8 rounded-xl shadow-lg shadow-black/20 flex items-center justify-center gap-2.5 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-black/30 transition-shadow"
+              >
+                Buy Now
+              </motion.button>
             </div>
 
             {/* Features Grid */}
