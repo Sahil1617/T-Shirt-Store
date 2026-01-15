@@ -1,4 +1,4 @@
-# 👕 T-Shirt Store
+# T-Shirt Store
 
 <div align="center">
 
@@ -12,24 +12,14 @@ A modern, full-stack e-commerce platform for t-shirts built with **React**, **No
 [![Vite](https://img.shields.io/badge/Vite-7.1.2-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-[Demo](#demo) • [Features](#-features) • [Installation](#-installation) • [API Documentation](#-api-documentation) • [Contributing](#-contributing)
+[Visit Live At](#-visit-live-at) • [Features](#-features) • [Installation](#-installation) • [API Documentation](#-api-documentation) • [Contributing](#-contributing)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Installation](#-installation)
-- [Environment Variables](#-environment-variables)
-- [Running the Application](#-running-the-application)
-- [API Documentation](#-api-documentation)
-- [Screenshots](#-screenshots)
-- [Contributing](#-contributing)
-- [License](#-license)
+## 🌐 Visit Live At:
+https://t-shirt-store-ind.vercel.app/
 
 ---
 
