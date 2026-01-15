@@ -24,7 +24,6 @@ https://t-shirt-store-ind.vercel.app/
 - **Tailwind CSS** - Utility-first CSS framework
 - **React Router** - Client-side routing
 - **Axios** - HTTP client
-- **Three.js** - 3D graphics and effects
 - **React Hot Toast** - Notification system
 
 ### Backend
