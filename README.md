@@ -2,8 +2,6 @@
 
 <div align="center">
 
-![T-Shirt Store Banner](./frontend/public/T.png)
-
 A modern, full-stack e-commerce platform for t-shirts built with **React**, **Node.js**, **Express**, and **MongoDB**.
 
 [![React](https://img.shields.io/badge/React-19.1.1-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactjs.org/)
