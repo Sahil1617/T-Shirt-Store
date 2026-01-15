@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![T-Shirt Store Banner](https://img.shields.io/badge/T--Shirt-Store-FF6B6B?style=for-the-badge&logo=shopify&logoColor=white)
+![T-Shirt Store Banner](frontend\public\T.png)
 
 A modern, full-stack e-commerce platform for t-shirts built with **React**, **Node.js**, **Express**, and **MongoDB**.
 
