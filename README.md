@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![T-Shirt Store Banner](frontend\public\T.png)
+![T-Shirt Store Banner](./frontend/public/T.png)
 
 A modern, full-stack e-commerce platform for t-shirts built with **React**, **Node.js**, **Express**, and **MongoDB**.
 
